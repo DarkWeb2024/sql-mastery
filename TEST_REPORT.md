@@ -2,15 +2,18 @@
 
 ## Automated tests
 
-Run with `npm run test` (Vitest). Latest run: 43 tests across 4 files, all
+Run with `npm run test` (Vitest). Latest run: 57 tests across 7 files, all
 passing.
 
-| Area                | File                                | What it covers                                                                 |
-|---------------------|-------------------------------------|--------------------------------------------------------------------------------|
-| Result comparison   | `src/lib/validate.test.ts`          | Unordered and ordered matching, column and row count mismatches, numbers, NULL |
-| Progress logic      | `src/lib/progressLogic.test.ts`     | Streak date math and the level curve                                           |
-| Components          | `src/components/components.test.tsx`| ResultGrid rendering (errors, rows, NULL) and the markdown renderer            |
-| Content integrity   | `tests/contentIntegrity.test.ts`    | Every practice solution runs against real SQLite and agrees with the validator |
+| Area                | File                                          | What it covers                                                                 |
+|---------------------|-----------------------------------------------|--------------------------------------------------------------------------------|
+| Result comparison   | `src/lib/validate.test.ts`                    | Unordered and ordered matching, column and row count mismatches, numbers, NULL |
+| Progress logic      | `src/lib/progressLogic.test.ts`               | Streak date math, the level curve, and the accuracy metric                     |
+| Spaced repetition   | `src/lib/srs.test.ts`                         | Scheduler intervals, ease floor, resets on a miss, and due dates               |
+| Components          | `src/components/components.test.tsx`          | ResultGrid rendering (errors, rows, NULL) and the markdown renderer            |
+| Reference window    | `src/features/reference/ReferenceWindow.test.tsx` | Opens, switches command, closes, and passes an axe accessibility check    |
+| Landing page        | `src/features/landing/LandingPage.test.tsx`   | Renders brand and courses, and passes an axe accessibility check               |
+| Content integrity   | `tests/contentIntegrity.test.ts`              | Every practice solution runs against real SQLite and agrees with the validator |
 
 The content-integrity test is the main correctness guard. It seeds the real
 database and runs all 23 authored solutions, checks that each returns rows,
@@ -30,13 +33,21 @@ asset and the production base path is `/sql-mastery/`.
 
 Verified on a running dev server:
 
+- Landing page renders with the Khwarizmi brand and multi-course catalog.
 - Roadmap renders all topic nodes with prerequisite edges and "coming soon"
   markers; clicking an available node opens its lesson.
 - Playground executes a real query against the seeded database and shows the
   correct rows.
-- Practice: solving a question is detected as correct, awards experience points,
-  and persists to localStorage.
+- Practice IDE: resizable panels render with question, schema, editor, and
+  results; solving a question is detected as correct, awards experience points,
+  records the attempt for accuracy, autosaves the draft, and persists to
+  localStorage.
+- Command reference window opens with all controls (pin, minimise, maximise,
+  close) and switches the selected command.
+- Settings apply live: high-contrast class is added and the font size changes;
+  preferences persist.
 - Certificate page renders the exam intro with the name field and start control.
+- Existing saved progress still loads after the store migration.
 - Light and dark themes both apply; layout holds at mobile width.
 - No console errors during the flows above.
 

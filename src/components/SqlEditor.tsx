@@ -4,7 +4,7 @@ import { useTheme } from '../app/ThemeProvider';
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  height?: number;
+  height?: number | string;
   onRun?: () => void;
 }
 
@@ -13,7 +13,7 @@ interface Props {
 export function SqlEditor({ value, onChange, height = 200, onRun }: Props) {
   const { theme } = useTheme();
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-300 dark:border-slate-700">
+    <div className="h-full overflow-hidden rounded-lg border border-slate-300 dark:border-slate-700">
       <Editor
         height={height}
         language="sql"

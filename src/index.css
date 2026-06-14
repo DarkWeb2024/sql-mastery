@@ -43,3 +43,56 @@ body {
 .react-flow__attribution {
   @apply bg-transparent text-[10px] opacity-50;
 }
+
+/* Always show a visible focus ring for keyboard users. */
+:focus-visible {
+  outline: 2px solid #1f5be0;
+  outline-offset: 2px;
+}
+
+/* High-contrast mode: strengthen borders and text. Toggled from settings. */
+.hc {
+  --tw-prose: initial;
+}
+.hc body {
+  @apply text-black dark:text-white;
+}
+.hc *,
+.hc *::before,
+.hc *::after {
+  border-color: currentColor !important;
+}
+.hc a,
+.hc button {
+  text-decoration-thickness: 2px;
+}
+
+/* Reduced motion: disable animations and transitions when requested, either
+   through the OS preference or the in-app toggle. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Colorblind-friendly: shift the success/brand greens and blues toward hues
+   that are easier to distinguish, and rely on text labels elsewhere. */
+.cb .bg-emerald-500,
+.cb .bg-emerald-600 {
+  background-color: #0072b2 !important;
+}
+.cb .text-emerald-600,
+.cb .text-emerald-700 {
+  color: #0072b2 !important;
+}

@@ -1,24 +1,62 @@
+import { lazy } from 'react';
 import { createHashRouter } from 'react-router-dom';
 import { Layout } from './Layout';
-import { RoadmapPage } from '../features/roadmap/RoadmapPage';
-import { PlaygroundPage } from '../features/playground/PlaygroundPage';
-import { TopicPage } from '../features/topics/TopicPage';
-import { PracticePage } from '../features/practice/PracticePage';
-import { DashboardPage } from '../features/progress/DashboardPage';
-import { CertificatePage } from '../features/certificate/CertificatePage';
-import { VerifyPage } from '../features/certificate/VerifyPage';
 
-// A hash router is used so that deep links work on GitHub Pages without any
-// server-side rewrite configuration.
+// Each route is code-split so the initial load only pulls in the shell. The
+// named exports are adapted to the default-export shape React.lazy expects.
+const LandingPage = lazy(() =>
+  import('../features/landing/LandingPage').then((m) => ({ default: m.LandingPage }))
+);
+const RoadmapPage = lazy(() =>
+  import('../features/roadmap/RoadmapPage').then((m) => ({ default: m.RoadmapPage }))
+);
+const CoursesPage = lazy(() =>
+  import('../features/courses/CoursesPage').then((m) => ({ default: m.CoursesPage }))
+);
+const PathsPage = lazy(() =>
+  import('../features/paths/PathsPage').then((m) => ({ default: m.PathsPage }))
+);
+const PlaygroundPage = lazy(() =>
+  import('../features/playground/PlaygroundPage').then((m) => ({ default: m.PlaygroundPage }))
+);
+const TopicPage = lazy(() =>
+  import('../features/topics/TopicPage').then((m) => ({ default: m.TopicPage }))
+);
+const PracticePage = lazy(() =>
+  import('../features/practice/PracticePage').then((m) => ({ default: m.PracticePage }))
+);
+const ReviewPage = lazy(() =>
+  import('../features/review/ReviewPage').then((m) => ({ default: m.ReviewPage }))
+);
+const BookmarksPage = lazy(() =>
+  import('../features/bookmarks/BookmarksPage').then((m) => ({ default: m.BookmarksPage }))
+);
+const DashboardPage = lazy(() =>
+  import('../features/progress/DashboardPage').then((m) => ({ default: m.DashboardPage }))
+);
+const CertificatePage = lazy(() =>
+  import('../features/certificate/CertificatePage').then((m) => ({ default: m.CertificatePage }))
+);
+const VerifyPage = lazy(() =>
+  import('../features/certificate/VerifyPage').then((m) => ({ default: m.VerifyPage }))
+);
+
+// A hash router is used so deep links work on GitHub Pages with no server
+// rewrites. Existing routes are preserved for backward compatibility.
 export const router = createHashRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
-      { index: true, element: <RoadmapPage /> },
+      { index: true, element: <LandingPage /> },
+      { path: 'roadmap', element: <RoadmapPage /> },
+      { path: 'courses', element: <CoursesPage /> },
+      { path: 'paths', element: <PathsPage /> },
       { path: 'playground', element: <PlaygroundPage /> },
       { path: 'topic/:id', element: <TopicPage /> },
       { path: 'practice/:topicId', element: <PracticePage /> },
+      { path: 'review', element: <ReviewPage /> },
+      { path: 'bookmarks', element: <BookmarksPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'certificate', element: <CertificatePage /> },
       { path: 'verify/:id', element: <VerifyPage /> },

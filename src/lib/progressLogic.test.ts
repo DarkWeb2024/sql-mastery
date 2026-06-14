@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dayDiff, todayKey } from './storage';
-import { levelFromXp } from '../features/progress/store';
+import { levelFromXp, accuracy } from '../features/progress/store';
 
 describe('streak date helpers', () => {
   it('formats a date as YYYY-MM-DD', () => {
@@ -30,5 +30,20 @@ describe('levelFromXp', () => {
     const { into, span } = levelFromXp(250);
     expect(into).toBeLessThan(span);
     expect(into).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('accuracy', () => {
+  it('is zero with no attempts', () => {
+    expect(accuracy({})).toBe(0);
+  });
+
+  it('is the percentage of correct attempts across questions', () => {
+    expect(
+      accuracy({
+        a: { attempts: 2, correct: 1 },
+        b: { attempts: 2, correct: 2 },
+      })
+    ).toBe(75);
   });
 });

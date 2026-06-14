@@ -1,30 +1,38 @@
-# SQL Mastery
+# Khwarizmi
 
-A practice-first platform for learning SQL from the basics through to advanced
-topics. It pairs short theory with a large amount of hands-on practice: an
-interactive roadmap, an in-browser SQL playground, graded practice questions, a
-certification exam, and progress tracking.
+A practice-first platform for learning data and programming, named after
+Al-Khwarizmi, whose work gave us the word algorithm. SQL is the first complete
+course, with more on the way. It pairs short theory with a large amount of
+hands-on practice: an interactive roadmap, an IDE-style practice workspace, an
+in-browser SQL playground, graded questions, a certification exam, spaced-
+repetition review, and progress tracking.
 
 The whole thing runs in the browser. SQL executes against a real SQLite database
 compiled to WebAssembly, so there is no backend to run or pay for, and it can be
-hosted on any static host.
+hosted on any static host. There are no accounts; progress is saved locally.
 
 ## Features
 
 - Interactive roadmap of SQL topics with prerequisite ordering.
+- HackerRank-style practice workspace with resizable, collapsible panels and
+  autosaved drafts. Answers are checked by running your query and comparing the
+  result to the canonical solution.
 - In-browser SQL playground with a Monaco editor and a realistic sample dataset.
-- Graded practice questions across five difficulty levels. Answers are checked
-  by running your query and comparing the result to the canonical solution.
+- A floating, draggable, dockable SQL command reference.
 - Certification exam with a timer, randomised questions, and a downloadable
   certificate of completion.
-- Progress tracking: experience points, levels, a daily streak, achievements,
-  and per-topic completion, all stored locally in the browser.
+- Learning depth: learning paths, skill radar, completion map, bookmarks,
+  per-lesson markdown notes, and spaced-repetition review with weak-topic hints.
+- Accessibility: keyboard navigation, ARIA, skip link, plus settings for text
+  size, high contrast, reduced motion, and a colorblind-friendly palette.
 - Light and dark themes, responsive from mobile to desktop.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full list of recent enhancements.
 
 ## Tech stack
 
 React, TypeScript, Vite, Tailwind CSS, React Router, Zustand, React Flow,
-Monaco, sql.js (SQLite via WebAssembly), and jsPDF.
+react-resizable-panels, Monaco, sql.js (SQLite via WebAssembly), and jsPDF.
 
 ## Getting started
 

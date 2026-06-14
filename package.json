@@ -17,6 +17,7 @@
     "jspdf": "^2.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-resizable-panels": "^2.1.9",
     "react-router-dom": "^6.26.2",
     "reactflow": "^11.11.4",
     "sql.js": "^1.12.0",
@@ -30,11 +31,13 @@
     "@types/sql.js": "^1.4.9",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "axe-core": "^4.12.1",
     "jsdom": "^25.0.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.12",
     "typescript": "^5.5.4",
     "vite": "^5.4.6",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.1",
+    "vitest-axe": "^0.1.0"
   }
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Difficulty } from '../../types';
 import { dayDiff, todayKey } from '../../lib/storage';
+import { newCard, schedule, type CardSchedule, type Grade } from '../../lib/srs';
 
 export const XP_BY_DIFFICULTY: Record<Difficulty, number> = {
   beginner: 10,
@@ -41,11 +42,36 @@ interface ProgressState {
   lastActiveDay: string | null;
   certificates: Certificate[];
 
+  // Phase 2 additions. All optional-by-default so existing saved progress keeps
+  // working: persist merges these defaults in for users who predate them.
+  bookmarkedTopics: Record<string, true>;
+  bookmarkedQuestions: Record<string, true>;
+  notes: Record<string, string>;
+  drafts: Record<string, string>;
+  attempts: Record<string, { attempts: number; correct: number }>;
+  recentActivity: ActivityItem[];
+  cards: Record<string, CardSchedule>;
+
   recordSolve: (questionId: string, difficulty: Difficulty) => void;
   completeTopic: (topicId: string) => void;
   registerActivity: () => void;
   addCertificate: (cert: Certificate) => void;
+  recordAttempt: (questionId: string, correct: boolean) => void;
+  toggleBookmarkTopic: (topicId: string) => void;
+  toggleBookmarkQuestion: (questionId: string) => void;
+  setNote: (topicId: string, markdown: string) => void;
+  setDraft: (questionId: string, sql: string) => void;
+  reviewCard: (cardId: string, grade: Grade) => void;
   reset: () => void;
+}
+
+export interface ActivityItem {
+  at: string;
+  label: string;
+}
+
+function pushActivity(list: ActivityItem[], label: string): ActivityItem[] {
+  return [{ at: new Date().toISOString(), label }, ...list].slice(0, 20);
 }
 
 export const useProgress = create<ProgressState>()(
@@ -57,15 +83,67 @@ export const useProgress = create<ProgressState>()(
       streakCount: 0,
       lastActiveDay: null,
       certificates: [],
+      bookmarkedTopics: {},
+      bookmarkedQuestions: {},
+      notes: {},
+      drafts: {},
+      attempts: {},
+      recentActivity: [],
+      cards: {},
 
       recordSolve: (questionId, difficulty) => {
         if (get().solved[questionId]) return; // award XP only once per question
         set((s) => ({
           solved: { ...s.solved, [questionId]: true },
           xp: s.xp + XP_BY_DIFFICULTY[difficulty],
+          recentActivity: pushActivity(s.recentActivity, `Solved a ${difficulty} question`),
         }));
         get().registerActivity();
       },
+
+      // Tracks every attempt for the accuracy metric, separate from the
+      // first-solve XP award above.
+      recordAttempt: (questionId, correct) =>
+        set((s) => {
+          const prev = s.attempts[questionId] ?? { attempts: 0, correct: 0 };
+          return {
+            attempts: {
+              ...s.attempts,
+              [questionId]: {
+                attempts: prev.attempts + 1,
+                correct: prev.correct + (correct ? 1 : 0),
+              },
+            },
+          };
+        }),
+
+      toggleBookmarkTopic: (topicId) =>
+        set((s) => {
+          const next = { ...s.bookmarkedTopics };
+          if (next[topicId]) delete next[topicId];
+          else next[topicId] = true;
+          return { bookmarkedTopics: next };
+        }),
+
+      toggleBookmarkQuestion: (questionId) =>
+        set((s) => {
+          const next = { ...s.bookmarkedQuestions };
+          if (next[questionId]) delete next[questionId];
+          else next[questionId] = true;
+          return { bookmarkedQuestions: next };
+        }),
+
+      setNote: (topicId, markdown) =>
+        set((s) => ({ notes: { ...s.notes, [topicId]: markdown } })),
+
+      setDraft: (questionId, sql) =>
+        set((s) => ({ drafts: { ...s.drafts, [questionId]: sql } })),
+
+      reviewCard: (cardId, grade) =>
+        set((s) => {
+          const prev = s.cards[cardId] ?? newCard();
+          return { cards: { ...s.cards, [cardId]: schedule(prev, grade) } };
+        }),
 
       completeTopic: (topicId) =>
         set((s) => ({ completedTopics: { ...s.completedTopics, [topicId]: true } })),
@@ -93,8 +171,32 @@ export const useProgress = create<ProgressState>()(
           streakCount: 0,
           lastActiveDay: null,
           certificates: [],
+          bookmarkedTopics: {},
+          bookmarkedQuestions: {},
+          notes: {},
+          drafts: {},
+          attempts: {},
+          recentActivity: [],
+          cards: {},
         }),
     }),
-    { name: 'sql-mastery-progress' }
+    {
+      name: 'sql-mastery-progress',
+      version: 2,
+      // Older saved state lacks the Phase 2 fields. Merge defaults in so it
+      // loads cleanly instead of leaving fields undefined.
+      migrate: (persisted) => persisted as ProgressState,
+      merge: (persisted, current) => ({ ...current, ...(persisted as Partial<ProgressState>) }),
+    }
   )
 );
+
+export function accuracy(attempts: Record<string, { attempts: number; correct: number }>): number {
+  let a = 0;
+  let c = 0;
+  for (const key of Object.keys(attempts)) {
+    a += attempts[key].attempts;
+    c += attempts[key].correct;
+  }
+  return a === 0 ? 0 : Math.round((c / a) * 100);
+}

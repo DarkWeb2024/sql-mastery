@@ -9,6 +9,20 @@ const base = process.env.NODE_ENV === 'production' ? '/sql-mastery/' : '/';
 export default defineConfig({
   base,
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy, independently-cacheable libraries out of the main bundle
+        // so the initial route loads less and vendors cache across deploys.
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          reactflow: ['reactflow'],
+          pdf: ['jspdf'],
+          sqljs: ['sql.js'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

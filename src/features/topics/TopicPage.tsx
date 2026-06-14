@@ -2,11 +2,14 @@ import { Link, useParams } from 'react-router-dom';
 import { getTopic } from '../../content/topics';
 import { Markdown } from '../../components/Markdown';
 import { useProgress } from '../../features/progress/store';
+import { TopicNotes } from './TopicNotes';
 
 export function TopicPage() {
   const { id = '' } = useParams();
   const topic = getTopic(id);
   const solved = useProgress((s) => s.solved);
+  const bookmarkedTopics = useProgress((s) => s.bookmarkedTopics);
+  const toggleBookmarkTopic = useProgress((s) => s.toggleBookmarkTopic);
 
   if (!topic) {
     return (
@@ -57,6 +60,14 @@ export function TopicPage() {
           >
             Open playground
           </Link>
+          <button
+            type="button"
+            onClick={() => toggleBookmarkTopic(topic.id)}
+            aria-pressed={Boolean(bookmarkedTopics[topic.id])}
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+          >
+            {bookmarkedTopics[topic.id] ? 'Bookmarked' : 'Bookmark'}
+          </button>
         </div>
       </header>
 
@@ -98,6 +109,8 @@ export function TopicPage() {
           ))}
         </div>
       </section>
+
+      <TopicNotes topicId={topic.id} />
     </article>
   );
 }

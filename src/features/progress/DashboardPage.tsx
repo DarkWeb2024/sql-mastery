@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useProgress, levelFromXp } from './store';
+import { useProgress, levelFromXp, accuracy } from './store';
 import { allTopics } from '../../content/topics';
+import { SkillRadar } from '../../components/SkillRadar';
+import { CompletionMap } from '../../components/CompletionMap';
 
 interface Achievement {
   id: string;
@@ -10,11 +12,22 @@ interface Achievement {
 }
 
 export function DashboardPage() {
-  const { xp, solved, completedTopics, streakCount, certificates, reset } = useProgress();
+  const { xp, solved, completedTopics, streakCount, certificates, attempts, recentActivity, reset } =
+    useProgress();
   const { level, into, span } = levelFromXp(xp);
   const solvedCount = Object.keys(solved).length;
   const builtTopics = allTopics.filter((t) => !t.comingSoon);
   const totalQuestions = builtTopics.reduce((n, t) => n + t.practice.length, 0);
+  const acc = accuracy(attempts);
+
+  // One radar axis per topic category: how much of that category is solved.
+  const categories = Array.from(new Set(builtTopics.map((t) => t.category)));
+  const radarAxes = categories.map((cat) => {
+    const inCat = builtTopics.filter((t) => t.category === cat);
+    const total = inCat.reduce((n, t) => n + t.practice.length, 0);
+    const done = inCat.reduce((n, t) => n + t.practice.filter((q) => solved[q.id]).length, 0);
+    return { label: cat, value: total === 0 ? 0 : done / total };
+  });
 
   const achievements: Achievement[] = [
     { id: 'first', title: 'First steps', description: 'Solve your first question.', earned: solvedCount >= 1 },
@@ -31,13 +44,54 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Your progress</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">Your progress</h1>
+        <div className="flex gap-3 text-sm">
+          <Link to="/bookmarks" className="text-brand-600 hover:underline">
+            Bookmarks
+          </Link>
+          <Link to="/review" className="text-brand-600 hover:underline">
+            Review
+          </Link>
+          <Link to="/paths" className="text-brand-600 hover:underline">
+            Learning paths
+          </Link>
+        </div>
+      </div>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Level" value={`${level}`} sub={`${into}/${span} XP to next`} />
         <Stat label="Total XP" value={`${xp}`} sub={`${solvedCount}/${totalQuestions} questions solved`} />
+        <Stat label="Accuracy" value={`${acc}%`} sub="across all attempts" />
         <Stat label="Daily streak" value={`${streakCount}`} sub={streakCount === 1 ? 'day' : 'days'} />
       </section>
+
+      <section className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+          <h2 className="mb-2 text-lg font-semibold">Skill coverage</h2>
+          <div className="flex justify-center text-slate-600 dark:text-slate-300">
+            <SkillRadar axes={radarAxes} />
+          </div>
+        </div>
+        <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+          <h2 className="mb-3 text-lg font-semibold">Completion map</h2>
+          <CompletionMap />
+        </div>
+      </section>
+
+      {recentActivity.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">Recent activity</h2>
+          <ul className="space-y-1 text-sm">
+            {recentActivity.slice(0, 8).map((a, i) => (
+              <li key={i} className="flex justify-between rounded-md border border-slate-200 px-3 py-2 dark:border-slate-800">
+                <span>{a.label}</span>
+                <span className="text-slate-400">{new Date(a.at).toLocaleString()}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">Topics</h2>
