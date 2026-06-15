@@ -1,26 +1,49 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import { Suspense, useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import {
+  Network,
+  Briefcase,
+  Dumbbell,
+  BarChart3,
+  ChevronDown,
+  BookMarked,
+  Settings as SettingsIcon,
+  Sun,
+  Moon,
+  Flame,
+  Zap,
+} from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useProgress, levelFromXp } from '../features/progress/store';
 import { BrandMark } from '../components/BrandMark';
 import { SettingsPanel } from '../components/SettingsPanel';
 import { ReferenceWindow } from '../features/reference/ReferenceWindow';
 import { Loading } from '../components/Loading';
+import { Badge, IconButton } from '../components/ui';
 
-const navItems = [
-  { to: '/tree', label: 'Tree' },
-  { to: '/missions', label: 'Missions' },
-  { to: '/learn', label: 'Smart Practice' },
-  { to: '/mentor', label: 'Mentor' },
+// Primary navigation is deliberately short: the four destinations that map to how
+// a learner actually moves (explore, do real work, practise, track growth).
+// Everything else lives under More so the header stays calm.
+const primaryNav = [
+  { to: '/tree', label: 'Tree', icon: Network },
+  { to: '/missions', label: 'Missions', icon: Briefcase },
+  { to: '/learn', label: 'Practice', icon: Dumbbell },
+  { to: '/dashboard', label: 'Progress', icon: BarChart3 },
+];
+
+const moreNav = [
   { to: '/playground', label: 'Playground' },
+  { to: '/mentor', label: 'Mentor' },
   { to: '/review', label: 'Review' },
-  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/paths', label: 'Learning paths' },
+  { to: '/bookmarks', label: 'Bookmarks' },
   { to: '/courses', label: 'Courses' },
   { to: '/certificate', label: 'Certificate' },
 ];
 
 export function Layout() {
   const { theme, toggle } = useTheme();
+  const location = useLocation();
   const xp = useProgress((s) => s.xp);
   const streak = useProgress((s) => s.streakCount);
   const registerActivity = useProgress((s) => s.registerActivity);
@@ -28,10 +51,29 @@ export function Layout() {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  // Pulse the XP badge when experience increases, so earning points has a moment.
+  const [xpPulse, setXpPulse] = useState(false);
+  const prevXp = useRef(xp);
+  useEffect(() => {
+    if (xp > prevXp.current) {
+      setXpPulse(true);
+      const t = setTimeout(() => setXpPulse(false), 450);
+      prevXp.current = xp;
+      return () => clearTimeout(t);
+    }
+    prevXp.current = xp;
+  }, [xp]);
 
   useEffect(() => {
     registerActivity();
   }, [registerActivity]);
+
+  // Close the More menu on navigation.
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="flex min-h-full flex-col">
@@ -42,73 +84,96 @@ export function Layout() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/70">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <NavLink to="/" aria-label="Khwarizmi home" className="shrink-0">
             <BrandMark />
           </NavLink>
 
-          <nav className="flex flex-1 items-center gap-1 overflow-x-auto" aria-label="Primary">
-            {navItems.map((item) => (
+          <nav className="ml-2 flex flex-1 items-center gap-1" aria-label="Primary">
+            {primaryNav.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  `flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
                     isActive
                       ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200'
                       : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                   }`
                 }
               >
-                {item.label}
+                <item.icon size={16} aria-hidden="true" />
+                <span className="hidden sm:inline">{item.label}</span>
               </NavLink>
             ))}
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((v) => !v)}
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
+                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                More <ChevronDown size={14} aria-hidden="true" />
+              </button>
+              {moreOpen && (
+                <div
+                  role="menu"
+                  className="absolute left-0 top-full mt-1 w-44 animate-fade-in rounded-xl bg-white p-1 shadow-float dark:bg-slate-900"
+                >
+                  {moreNav.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      role="menuitem"
+                      className={({ isActive }) =>
+                        `block rounded-lg px-3 py-2 text-sm transition-colors ${
+                          isActive
+                            ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                        }`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span
-              className="hidden items-center gap-1 rounded-full bg-amber-100 px-2 py-1 font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 md:flex"
-              title="Daily streak"
-            >
-              {streak}d
-            </span>
-            <span
-              className="hidden items-center gap-1 rounded-full bg-brand-100 px-2 py-1 font-medium text-brand-800 dark:bg-brand-900/40 dark:text-brand-200 md:flex"
-              title="Experience and level"
-            >
-              Lv {level} · {xp} XP
-            </span>
-            <button
-              type="button"
-              onClick={() => setReferenceOpen((v) => !v)}
-              aria-pressed={referenceOpen}
-              className="rounded-md border border-slate-300 px-2 py-1.5 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-            >
-              Reference
-            </button>
-            <button
-              type="button"
-              onClick={() => setSettingsOpen(true)}
-              className="rounded-md border border-slate-300 px-2 py-1.5 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-            >
-              Settings
-            </button>
-            <button
-              type="button"
+          <div className="flex items-center gap-1.5">
+            <Badge tone="accent" className="hidden md:inline-flex">
+              <Flame size={13} aria-hidden="true" /> {streak}
+            </Badge>
+            <Badge tone="brand" className={`hidden md:inline-flex ${xpPulse ? 'animate-pop' : ''}`}>
+              <Zap size={13} aria-hidden="true" /> Lv {level} · {xp}
+            </Badge>
+            <IconButton label="SQL reference" pressed={referenceOpen} onClick={() => setReferenceOpen((v) => !v)}>
+              <BookMarked size={18} />
+            </IconButton>
+            <IconButton label="Settings" onClick={() => setSettingsOpen(true)}>
+              <SettingsIcon size={18} />
+            </IconButton>
+            <IconButton
+              label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               onClick={toggle}
-              className="rounded-md border border-slate-300 px-2 py-1.5 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {theme === 'dark' ? 'Light' : 'Dark'}
-            </button>
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </IconButton>
           </div>
         </div>
       </header>
 
       <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Suspense fallback={<Loading />}>
-          <Outlet />
+          {/* Keying on the path replays a short enter transition between routes,
+              so navigation feels like movement rather than a hard page swap. */}
+          <div key={location.pathname} className="animate-fade-in">
+            <Outlet />
+          </div>
         </Suspense>
       </main>
 

@@ -1,5 +1,32 @@
 # Changelog
 
+## Phase 6 — Design System V1 and a tree that feels alive
+
+A product-experience pass, in response to the board's concern that the
+architecture had outrun the experience. The brief was to stop the product feeling
+static, page-oriented, and engineer-built. No learning systems were changed.
+
+- **Design System V1:** semantic design tokens with a new signature warm-gold
+  accent paired with the brand blue, an elevation scale (shadows replacing
+  borders-everywhere), motion tokens, and canonical UI primitives (Button, Card,
+  Badge, IconButton) to end ad-hoc styling.
+- **Icons:** adopted lucide, removing the text-glyph chrome that made the product
+  look unfinished.
+- **Navigation simplified:** from eight flat links to four primary destinations
+  (Tree, Missions, Practice, Progress) plus a More menu, with an icon-led header.
+- **Motion baseline:** route-change transitions, an animated detail panel and
+  menus, and a success microinteraction (the XP badge pulses when you earn
+  points). All gated by reduced-motion.
+- **The Knowledge Tree is now a spatial canvas, not an outline.** Pan and zoom
+  the whole of SQL as one map; hovering a node lights up its dependencies;
+  clicking focuses the camera and opens a detail panel without leaving the map;
+  node colour and a mastery bar form a live heatmap; a minimap aids orientation.
+  This also merges the old separate roadmap (now redirects to the tree).
+- Loading states are now skeletons instead of a bare spinner.
+
+Tests remain at 122 (this was an experience pass; the learning engine is
+unchanged). Next: put a real learner through it.
+
 ## Phase 5 — Mission Framework V1 (from query practice to professional thinking)
 
 Board-approved build after the strategy review. The shift: SQL stops being the

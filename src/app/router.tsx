@@ -1,14 +1,11 @@
 import { lazy } from 'react';
-import { createHashRouter } from 'react-router-dom';
+import { createHashRouter, Navigate } from 'react-router-dom';
 import { Layout } from './Layout';
 
 // Each route is code-split so the initial load only pulls in the shell. The
 // named exports are adapted to the default-export shape React.lazy expects.
 const LandingPage = lazy(() =>
   import('../features/landing/LandingPage').then((m) => ({ default: m.LandingPage }))
-);
-const RoadmapPage = lazy(() =>
-  import('../features/roadmap/RoadmapPage').then((m) => ({ default: m.RoadmapPage }))
 );
 const KnowledgeTreePage = lazy(() =>
   import('../features/tree/KnowledgeTreePage').then((m) => ({ default: m.KnowledgeTreePage }))
@@ -69,7 +66,7 @@ export const router = createHashRouter([
       { path: 'mentor', element: <MentorPage /> },
       { path: 'missions', element: <MissionsListPage /> },
       { path: 'mission/:id', element: <MissionPage /> },
-      { path: 'roadmap', element: <RoadmapPage /> },
+      { path: 'roadmap', element: <Navigate to="/tree" replace /> },
       { path: 'courses', element: <CoursesPage /> },
       { path: 'paths', element: <PathsPage /> },
       { path: 'playground', element: <PlaygroundPage /> },

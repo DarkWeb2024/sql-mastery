@@ -1,185 +1,314 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { subjectTrees, type TreeNode } from '../../content/tree';
+import ReactFlow, {
+  Background,
+  Controls,
+  MiniMap,
+  Handle,
+  Position,
+  type Edge,
+  type Node,
+  type NodeProps,
+  type ReactFlowInstance,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import { sqlTree, type TreeNode } from '../../content/tree';
 import { computeTreeState, STATUS_LABEL, type NodeComputed, type NodeStatus } from '../../lib/treeState';
 import { useProgress } from '../progress/store';
+import { useSettings } from '../../app/SettingsProvider';
+import { Badge } from '../../components/ui';
 
-const STATUS_STYLE: Record<NodeStatus, string> = {
-  planned: 'border-dashed border-slate-300 text-slate-400 dark:border-slate-700',
-  locked: 'border-slate-300 text-slate-400 dark:border-slate-700',
-  available: 'border-brand-300 dark:border-brand-700',
-  'in-progress': 'border-amber-300 dark:border-amber-700',
-  completed: 'border-emerald-300 dark:border-emerald-700',
-  mastered: 'border-emerald-500 dark:border-emerald-500',
-  'needs-revision': 'border-amber-400 dark:border-amber-600',
-  forgotten: 'border-red-400 dark:border-red-700',
+// The tree is the defining experience, so it is a spatial canvas you pan, zoom,
+// and focus into, not an outline you scroll. Each node carries its live status
+// and mastery; hovering a node lights up its dependencies; clicking focuses the
+// camera on it and opens a detail panel without leaving the map.
+
+const COL_W = 240;
+const ROW_H = 70;
+const NODE_W = 200;
+const NODE_H = 52;
+
+const STATUS_ACCENT: Record<NodeStatus, string> = {
+  planned: '#94a3b8',
+  locked: '#94a3b8',
+  available: '#3478f6',
+  'in-progress': '#d99a2c',
+  completed: '#10b981',
+  mastered: '#059669',
+  'needs-revision': '#d99a2c',
+  forgotten: '#ef4444',
 };
 
-const STATUS_DOT: Record<NodeStatus, string> = {
-  planned: 'bg-slate-300',
-  locked: 'bg-slate-400',
-  available: 'bg-brand-500',
-  'in-progress': 'bg-amber-500',
-  completed: 'bg-emerald-400',
-  mastered: 'bg-emerald-600',
-  'needs-revision': 'bg-amber-500',
-  forgotten: 'bg-red-500',
-};
-
-function importanceLabel(v?: string) {
-  return v ? `${v} interview value` : '';
-}
-
-function Row({
-  node,
-  depth,
-  states,
-}: {
+interface NodeData {
   node: TreeNode;
-  depth: number;
-  states: Map<string, NodeComputed>;
-}) {
-  const computed = states.get(node.id);
-  const [open, setOpen] = useState(depth < 1);
-  const hasChildren = Boolean(node.children && node.children.length);
+  computed?: NodeComputed;
+  dimmed: boolean;
+}
+
+function TreeFlowNode({ data }: NodeProps<NodeData>) {
+  const { node, computed, dimmed } = data;
   const status = computed?.status ?? 'planned';
-
+  const accent = STATUS_ACCENT[status];
+  const mastery = computed?.mastery ?? 0;
   return (
-    <li>
-      <div
-        className={`flex flex-wrap items-center gap-2 rounded-lg border bg-white p-3 dark:bg-slate-900 ${STATUS_STYLE[status]}`}
-        style={{ marginLeft: depth * 16 }}
-      >
-        {hasChildren ? (
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-label={`${open ? 'Collapse' : 'Expand'} ${node.title}`}
-            className="grid h-6 w-6 place-items-center rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            {open ? '−' : '+'}
-          </button>
-        ) : (
-          <span className="inline-block h-6 w-6" aria-hidden="true" />
-        )}
-
-        <span className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} aria-hidden="true" />
-
-        <span className="font-medium">{node.title}</span>
-
-        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          {STATUS_LABEL[status]}
-        </span>
-
-        {node.difficulty && (
-          <span className="text-[11px] uppercase tracking-wide text-slate-400">{node.difficulty}</span>
-        )}
-
-        <span className="ml-auto flex items-center gap-3 text-xs text-slate-500">
-          {node.estMinutes ? <span>{node.estMinutes} min</span> : null}
-          {node.interviewImportance ? <span className="hidden sm:inline">{importanceLabel(node.interviewImportance)}</span> : null}
-        </span>
-
-        {node.topicId && (
-          <span className="flex gap-2">
-            <Link to={`/topic/${node.topicId}`} className="text-xs font-medium text-brand-600 hover:underline">
-              Lesson
-            </Link>
-            <Link to={`/practice/${node.topicId}`} className="text-xs font-medium text-brand-600 hover:underline">
-              Practice
-            </Link>
-          </span>
-        )}
+    <div
+      className="rounded-xl bg-white px-3 py-2 shadow-card transition-all duration-150 dark:bg-slate-900"
+      style={{
+        width: NODE_W,
+        height: NODE_H,
+        borderLeft: `4px solid ${accent}`,
+        opacity: dimmed ? 0.35 : 1,
+      }}
+    >
+      <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-slate-300" />
+      <div className="flex items-center gap-1.5">
+        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: accent }} aria-hidden="true" />
+        <span className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{node.title}</span>
       </div>
-
-      {/* Progress and dependency detail */}
-      {computed?.hasContent && (
-        <div className="mb-1 ml-12 mt-1 flex items-center gap-3 text-[11px] text-slate-500" style={{ marginLeft: depth * 16 + 48 }}>
-          <Meter label="Completion" value={computed.completion} />
-          <Meter label="Mastery" value={computed.mastery} />
-          <span>
-            {computed.solvedQuestions}/{computed.totalQuestions} solved
-          </span>
+      {computed?.hasContent ? (
+        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
+          <div className="h-full rounded-full" style={{ width: `${mastery}%`, background: accent }} />
         </div>
+      ) : (
+        <div className="mt-1 text-[10px] uppercase tracking-wide text-slate-400">{STATUS_LABEL[status]}</div>
       )}
-      {node.prerequisites && node.prerequisites.length > 0 && (
-        <p className="ml-12 text-[11px] text-slate-400" style={{ marginLeft: depth * 16 + 48 }}>
-          Needs first: {node.prerequisites.join(', ')}
-        </p>
-      )}
-
-      {hasChildren && open && (
-        <ul className="mt-1 space-y-1">
-          {node.children!.map((c) => (
-            <Row key={c.id} node={c} depth={depth + 1} states={states} />
-          ))}
-        </ul>
-      )}
-    </li>
+      <Handle type="source" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-slate-300" />
+    </div>
   );
 }
 
-function Meter({ label, value }: { label: string; value: number }) {
-  return (
-    <span className="flex items-center gap-1" title={`${label} ${value}%`}>
-      <span className="hidden sm:inline">{label}</span>
-      <span className="inline-block h-1.5 w-16 rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
-        <span className="block h-full rounded-full bg-brand-500" style={{ width: `${value}%` }} />
-      </span>
-      <span>{value}%</span>
-    </span>
-  );
+const nodeTypes = { tree: TreeFlowNode };
+
+// Tidy left-to-right layout: leaves take successive rows, parents sit at the
+// average height of their children, depth maps to columns.
+function layout(states: Map<string, NodeComputed>) {
+  const nodes: Node<NodeData>[] = [];
+  const edges: Edge[] = [];
+  let cursor = 0;
+
+  function place(node: TreeNode, depth: number): number {
+    let y: number;
+    if (node.children && node.children.length) {
+      const ys = node.children.map((c) => place(c, depth + 1));
+      y = ys.reduce((a, b) => a + b, 0) / ys.length;
+      node.children.forEach((c) => {
+        edges.push({
+          id: `${node.id}-${c.id}`,
+          source: node.id,
+          target: c.id,
+          type: 'smoothstep',
+          style: { stroke: '#cbd5e1', strokeWidth: 1.5 },
+        });
+      });
+    } else {
+      y = cursor * ROW_H;
+      cursor += 1;
+    }
+    nodes.push({
+      id: node.id,
+      type: 'tree',
+      position: { x: depth * COL_W, y },
+      data: { node, computed: states.get(node.id), dimmed: false },
+      draggable: false,
+    });
+    return y;
+  }
+
+  (sqlTree.root.children ?? []).forEach((section) => place(section, 0));
+  return { nodes, edges };
 }
 
 export function KnowledgeTreePage() {
   const attempts = useProgress((s) => s.attempts);
   const solved = useProgress((s) => s.solved);
+  const { settings } = useSettings();
 
-  const sql = subjectTrees.find((s) => s.id === 'sql')!;
-  const states = useMemo(() => computeTreeState(sql.root, attempts, solved), [sql.root, attempts, solved]);
+  const states = useMemo(() => computeTreeState(sqlTree.root, attempts, solved), [attempts, solved]);
+  const base = useMemo(() => layout(states), [states]);
 
-  const comingSoon = subjectTrees.filter((s) => s.status === 'coming-soon');
+  const [instance, setInstance] = useState<ReactFlowInstance | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+
+  // Connected set for dependency highlighting on hover.
+  const connected = useMemo(() => {
+    if (!hoverId) return null;
+    const set = new Set<string>([hoverId]);
+    base.edges.forEach((e) => {
+      if (e.source === hoverId) set.add(e.target);
+      if (e.target === hoverId) set.add(e.source);
+    });
+    return set;
+  }, [hoverId, base.edges]);
+
+  const nodes = useMemo(
+    () =>
+      base.nodes.map((n) => ({
+        ...n,
+        data: { ...n.data, dimmed: connected ? !connected.has(n.id) : false },
+      })),
+    [base.nodes, connected]
+  );
+
+  const edges = useMemo(
+    () =>
+      base.edges.map((e) => {
+        const active = hoverId && (e.source === hoverId || e.target === hoverId);
+        return active
+          ? { ...e, animated: !settings.reducedMotion, style: { stroke: '#3478f6', strokeWidth: 2 } }
+          : { ...e, style: { ...e.style, opacity: hoverId ? 0.3 : 1 } };
+      }),
+    [base.edges, hoverId, settings.reducedMotion]
+  );
+
+  const onNodeClick = useCallback(
+    (_e: MouseEvent, node: Node) => {
+      setSelectedId(node.id);
+      if (instance) {
+        instance.setCenter(node.position.x + NODE_W / 2, node.position.y + NODE_H / 2, {
+          zoom: 1.25,
+          duration: settings.reducedMotion ? 0 : 450,
+        });
+      }
+    },
+    [instance, settings.reducedMotion]
+  );
+
+  const selected = selectedId ? findNode(selectedId) : null;
+  const selectedComputed = selectedId ? states.get(selectedId) : undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <header>
         <h1 className="text-2xl font-bold">Knowledge Tree</h1>
         <p className="mt-1 text-slate-600 dark:text-slate-300">
-          The full path to SQL mastery. Each node shows where you stand and what unlocks next. Colour
-          and label both signal status, so it reads without relying on colour alone.
+          The whole of SQL as one map. Pan and zoom to explore, hover a node to light up what it
+          depends on, and click to focus in. Colour shows where you stand.
         </p>
       </header>
 
       <Legend />
 
-      <section aria-label="SQL knowledge tree">
-        <ul className="space-y-1">
-          {sql.root.children?.map((node) => (
-            <Row key={node.id} node={node} depth={0} states={states} />
-          ))}
-        </ul>
-      </section>
+      <div className="relative h-[600px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onInit={setInstance}
+          onNodeClick={onNodeClick}
+          onNodeMouseEnter={(_e, n) => setHoverId(n.id)}
+          onNodeMouseLeave={() => setHoverId(null)}
+          onPaneClick={() => setSelectedId(null)}
+          fitView
+          minZoom={0.2}
+          proOptions={{ hideAttribution: false }}
+        >
+          <Background gap={24} color="#e2e8f0" />
+          <Controls showInteractive={false} />
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor={(n) => STATUS_ACCENT[(n.data as NodeData).computed?.status ?? 'planned']}
+            className="!hidden sm:!block"
+          />
+        </ReactFlow>
 
-      <section>
-        <h2 className="mb-2 text-lg font-semibold">More subjects</h2>
-        <p className="mb-3 text-sm text-slate-500">
-          The same tree structure will hold every future subject, a learning operating system rather
-          than a single course.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {comingSoon.map((s) => (
-            <span
-              key={s.id}
-              className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm text-slate-400 dark:border-slate-700"
-            >
-              {s.title} — soon
-            </span>
-          ))}
-        </div>
-      </section>
+        {selected && (
+          <aside className="absolute right-3 top-3 w-72 animate-fade-in rounded-xl bg-white p-4 shadow-float dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="font-semibold">{selected.title}</h2>
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                aria-label="Close detail"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              >
+                ✕
+              </button>
+            </div>
+            {selected.blurb && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{selected.blurb}</p>}
+
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <Badge tone={statusTone(selectedComputed?.status)}>
+                {STATUS_LABEL[selectedComputed?.status ?? 'planned']}
+              </Badge>
+              {selected.difficulty && <Badge tone="neutral">{selected.difficulty}</Badge>}
+              {selected.interviewImportance && (
+                <Badge tone="accent">{selected.interviewImportance} interview value</Badge>
+              )}
+            </div>
+
+            {selectedComputed?.hasContent && (
+              <dl className="mt-3 space-y-1 text-sm">
+                <Row label="Completion" value={`${selectedComputed.completion}%`} />
+                <Row label="Mastery" value={`${selectedComputed.mastery}%`} />
+                <Row label="Solved" value={`${selectedComputed.solvedQuestions}/${selectedComputed.totalQuestions}`} />
+              </dl>
+            )}
+            {selected.estMinutes && (
+              <p className="mt-2 text-xs text-slate-500">Estimated {selected.estMinutes} min</p>
+            )}
+            {selected.prerequisites && selected.prerequisites.length > 0 && (
+              <p className="mt-2 text-xs text-slate-400">Needs first: {selected.prerequisites.join(', ')}</p>
+            )}
+
+            {selected.topicId && (
+              <div className="mt-4 flex gap-2">
+                <Link
+                  to={`/topic/${selected.topicId}`}
+                  className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700"
+                >
+                  Lesson
+                </Link>
+                <Link
+                  to={`/practice/${selected.topicId}`}
+                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+                >
+                  Practice
+                </Link>
+              </div>
+            )}
+          </aside>
+        )}
+      </div>
     </div>
   );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className="font-medium">{value}</dd>
+    </div>
+  );
+}
+
+function statusTone(status?: NodeStatus) {
+  switch (status) {
+    case 'mastered':
+    case 'completed':
+      return 'success' as const;
+    case 'forgotten':
+      return 'danger' as const;
+    case 'in-progress':
+    case 'needs-revision':
+      return 'warn' as const;
+    case 'available':
+      return 'brand' as const;
+    default:
+      return 'neutral' as const;
+  }
+}
+
+function findNode(id: string): TreeNode | null {
+  const stack = [...(sqlTree.root.children ?? [])];
+  while (stack.length) {
+    const n = stack.pop()!;
+    if (n.id === id) return n;
+    if (n.children) stack.push(...n.children);
+  }
+  return null;
 }
 
 function Legend() {
@@ -194,10 +323,10 @@ function Legend() {
     'planned',
   ];
   return (
-    <div className="flex flex-wrap gap-3 rounded-lg border border-slate-200 p-3 text-xs dark:border-slate-800">
+    <div className="flex flex-wrap gap-3 rounded-xl bg-white p-3 text-xs shadow-card dark:bg-slate-900">
       {items.map((s) => (
         <span key={s} className="flex items-center gap-1.5">
-          <span className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[s]}`} aria-hidden="true" />
+          <span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS_ACCENT[s] }} aria-hidden="true" />
           {STATUS_LABEL[s]}
         </span>
       ))}
