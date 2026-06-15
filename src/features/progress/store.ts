@@ -64,6 +64,7 @@ interface ProgressState {
   aiConfig: AiConfig;
   goal: string;
   mode: LearningMode | null;
+  missions: Record<string, MissionRecord>;
 
   recordSolve: (questionId: string, difficulty: Difficulty) => void;
   completeTopic: (topicId: string) => void;
@@ -78,12 +79,46 @@ interface ProgressState {
   setNote: (topicId: string, markdown: string) => void;
   setDraft: (questionId: string, sql: string) => void;
   reviewCard: (cardId: string, grade: Grade) => void;
+  solveMissionStep: (missionId: string, stepId: string) => void;
+  updateMission: (missionId: string, patch: Partial<MissionRecord>) => void;
+  completeMission: (missionId: string) => void;
   reset: () => void;
 }
 
 export interface ActivityItem {
   at: string;
   label: string;
+}
+
+export interface MissionConfidence {
+  level: number; // 0..100
+  supporting: string;
+  wouldChange: string;
+  fragileAssumption: string;
+}
+
+export interface MissionReflection {
+  whyApproach: string;
+  alternatives: string;
+  assumptions: string;
+  ifDataChanged: string;
+}
+
+export interface MissionRecord {
+  stepsSolved: Record<string, true>;
+  recommendation: string;
+  confidence: MissionConfidence;
+  reflection: MissionReflection;
+  completedAt?: string;
+}
+
+export function emptyMissionRecord(): MissionRecord {
+  return {
+    stepsSolved: {},
+    recommendation: '',
+    confidence: { level: 70, supporting: '', wouldChange: '', fragileAssumption: '' },
+    reflection: { whyApproach: '', alternatives: '', assumptions: '', ifDataChanged: '' },
+  };
 }
 
 function pushActivity(list: ActivityItem[], label: string): ActivityItem[] {
@@ -109,6 +144,7 @@ export const useProgress = create<ProgressState>()(
       aiConfig: DEFAULT_AI_CONFIG,
       goal: '',
       mode: null,
+      missions: {},
 
       recordSolve: (questionId, difficulty) => {
         if (get().solved[questionId]) return; // award XP only once per question
@@ -169,6 +205,37 @@ export const useProgress = create<ProgressState>()(
           return { cards: { ...s.cards, [cardId]: schedule(prev, grade) } };
         }),
 
+      solveMissionStep: (missionId, stepId) =>
+        set((s) => {
+          const rec = s.missions[missionId] ?? emptyMissionRecord();
+          return {
+            missions: {
+              ...s.missions,
+              [missionId]: { ...rec, stepsSolved: { ...rec.stepsSolved, [stepId]: true } },
+            },
+          };
+        }),
+
+      updateMission: (missionId, patch) =>
+        set((s) => {
+          const rec = s.missions[missionId] ?? emptyMissionRecord();
+          return { missions: { ...s.missions, [missionId]: { ...rec, ...patch } } };
+        }),
+
+      completeMission: (missionId) =>
+        set((s) => {
+          const rec = s.missions[missionId] ?? emptyMissionRecord();
+          if (rec.completedAt) return {};
+          return {
+            missions: {
+              ...s.missions,
+              [missionId]: { ...rec, completedAt: new Date().toISOString() },
+            },
+            xp: s.xp + 100,
+            recentActivity: pushActivity(s.recentActivity, 'Completed a mission'),
+          };
+        }),
+
       completeTopic: (topicId) =>
         set((s) => ({ completedTopics: { ...s.completedTopics, [topicId]: true } })),
 
@@ -205,11 +272,12 @@ export const useProgress = create<ProgressState>()(
           aiConfig: DEFAULT_AI_CONFIG,
           goal: '',
           mode: null,
+          missions: {},
         }),
     }),
     {
       name: 'sql-mastery-progress',
-      version: 3,
+      version: 4,
       // Older saved state lacks the Phase 2 fields. Merge defaults in so it
       // loads cleanly instead of leaving fields undefined.
       migrate: (persisted) => persisted as ProgressState,

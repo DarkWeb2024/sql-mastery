@@ -9,6 +9,7 @@ import { Loading } from '../components/Loading';
 
 const navItems = [
   { to: '/tree', label: 'Tree' },
+  { to: '/missions', label: 'Missions' },
   { to: '/learn', label: 'Smart Practice' },
   { to: '/mentor', label: 'Mentor' },
   { to: '/playground', label: 'Playground' },

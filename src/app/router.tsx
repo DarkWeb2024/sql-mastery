@@ -28,6 +28,12 @@ const LearnPage = lazy(() =>
 const MentorPage = lazy(() =>
   import('../features/mentor/MentorPage').then((m) => ({ default: m.MentorPage }))
 );
+const MissionsListPage = lazy(() =>
+  import('../features/missions/MissionsListPage').then((m) => ({ default: m.MissionsListPage }))
+);
+const MissionPage = lazy(() =>
+  import('../features/missions/MissionPage').then((m) => ({ default: m.MissionPage }))
+);
 const TopicPage = lazy(() =>
   import('../features/topics/TopicPage').then((m) => ({ default: m.TopicPage }))
 );
@@ -61,6 +67,8 @@ export const router = createHashRouter([
       { path: 'tree', element: <KnowledgeTreePage /> },
       { path: 'learn', element: <LearnPage /> },
       { path: 'mentor', element: <MentorPage /> },
+      { path: 'missions', element: <MissionsListPage /> },
+      { path: 'mission/:id', element: <MissionPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'courses', element: <CoursesPage /> },
       { path: 'paths', element: <PathsPage /> },

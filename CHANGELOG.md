@@ -1,5 +1,40 @@
 # Changelog
 
+## Phase 5 — Mission Framework V1 (from query practice to professional thinking)
+
+Board-approved build after the strategy review. The shift: SQL stops being the
+objective and becomes the tool. A mission puts the learner in a role, gives them
+a real business problem, and walks them through investigate → decide → calibrate
+→ reflect → keep an artifact.
+
+- **Mission Framework V1**, a Product-Layer runtime that runs over content it
+  never hardcodes: validated investigation steps, a decision phase, confidence
+  calibration, a reflection phase, and an exportable portfolio artifact.
+- **First mission:** *Data Analyst at an e-commerce retailer — "Revenue dropped
+  12%."* Five validated steps drill from the headline number down to the root
+  cause (a returning-customer retention problem in Electronics), then the learner
+  recommends an action and defends it. New `ecommerce` revenue dataset.
+- **Confidence calibration** (how confident, supporting evidence, what would
+  change your mind, most fragile assumption) — training judgment under
+  uncertainty, not just correctness.
+- **Reflection** promoted toward a first-class step (why this approach,
+  alternatives, assumptions, what if the data changed); answers are captured, not
+  auto-graded.
+- **Analytical Patterns** and **Thinking Tags** added as first-class, reusable
+  vocabularies (period-over-period, segment contribution, root-cause drill-down;
+  problem-framing, decomposition, elimination, confidence-calibration, and more)
+  and surfaced on missions.
+- **Portfolio artifact export:** a Markdown report of the investigation,
+  decision, confidence, and reasoning the learner keeps and can show. Evidence of
+  thinking, not a completion badge.
+- Product Layer (runtime, reflection, calibration, tags, artifact) is designed to
+  survive if every SQL lesson were deleted; SQL, datasets, and missions are the
+  Content Layer. Tests: 122 (mission steps validated against the engine).
+
+Explicitly not built (per board): additional domains, accounts/cloud, the
+Decision Graph inference engine, more strategy memos. Next decision is to come
+from observing a real learner, not theory.
+
 ## Phase 4 — content depth (the engine finally has road)
 
 The platform had a strong learning engine but very little to learn from. This
