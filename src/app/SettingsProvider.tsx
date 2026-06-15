@@ -8,6 +8,7 @@ export interface Settings {
   highContrast: boolean;
   reducedMotion: boolean;
   colorblind: boolean;
+  dyslexia: boolean;
 }
 
 interface SettingsContextValue {
@@ -26,6 +27,7 @@ const defaults: Settings = {
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   colorblind: false,
+  dyslexia: false,
 };
 
 const FONT_PX: Record<FontScale, string> = { sm: '15px', md: '16px', lg: '18px' };
@@ -44,6 +46,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     root.classList.toggle('hc', settings.highContrast);
     root.classList.toggle('reduce-motion', settings.reducedMotion);
     root.classList.toggle('cb', settings.colorblind);
+    root.classList.toggle('dyslexia', settings.dyslexia);
     writeJson(STORAGE_KEY, settings);
   }, [settings]);
 

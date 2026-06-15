@@ -8,11 +8,13 @@ import { ReferenceWindow } from '../features/reference/ReferenceWindow';
 import { Loading } from '../components/Loading';
 
 const navItems = [
-  { to: '/courses', label: 'Courses' },
-  { to: '/roadmap', label: 'Roadmap' },
+  { to: '/tree', label: 'Tree' },
+  { to: '/learn', label: 'Smart Practice' },
+  { to: '/mentor', label: 'Mentor' },
   { to: '/playground', label: 'Playground' },
   { to: '/review', label: 'Review' },
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/courses', label: 'Courses' },
   { to: '/certificate', label: 'Certificate' },
 ];
 

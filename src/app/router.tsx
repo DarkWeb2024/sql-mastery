@@ -10,6 +10,9 @@ const LandingPage = lazy(() =>
 const RoadmapPage = lazy(() =>
   import('../features/roadmap/RoadmapPage').then((m) => ({ default: m.RoadmapPage }))
 );
+const KnowledgeTreePage = lazy(() =>
+  import('../features/tree/KnowledgeTreePage').then((m) => ({ default: m.KnowledgeTreePage }))
+);
 const CoursesPage = lazy(() =>
   import('../features/courses/CoursesPage').then((m) => ({ default: m.CoursesPage }))
 );
@@ -18,6 +21,12 @@ const PathsPage = lazy(() =>
 );
 const PlaygroundPage = lazy(() =>
   import('../features/playground/PlaygroundPage').then((m) => ({ default: m.PlaygroundPage }))
+);
+const LearnPage = lazy(() =>
+  import('../features/learn/LearnPage').then((m) => ({ default: m.LearnPage }))
+);
+const MentorPage = lazy(() =>
+  import('../features/mentor/MentorPage').then((m) => ({ default: m.MentorPage }))
 );
 const TopicPage = lazy(() =>
   import('../features/topics/TopicPage').then((m) => ({ default: m.TopicPage }))
@@ -49,6 +58,9 @@ export const router = createHashRouter([
     element: <Layout />,
     children: [
       { index: true, element: <LandingPage /> },
+      { path: 'tree', element: <KnowledgeTreePage /> },
+      { path: 'learn', element: <LearnPage /> },
+      { path: 'mentor', element: <MentorPage /> },
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'courses', element: <CoursesPage /> },
       { path: 'paths', element: <PathsPage /> },

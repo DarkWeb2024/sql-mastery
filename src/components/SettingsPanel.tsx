@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSettings, type FontScale } from '../app/SettingsProvider';
+import { useProgress } from '../features/progress/store';
+import type { ProviderId } from '../lib/ai/types';
 
 interface Props {
   open: boolean;
@@ -16,6 +18,8 @@ const FONT_OPTIONS: { value: FontScale; label: string }[] = [
 // Escape and returns focus to the trigger.
 export function SettingsPanel({ open, onClose }: Props) {
   const { settings, update } = useSettings();
+  const aiConfig = useProgress((s) => s.aiConfig);
+  const setAiConfig = useProgress((s) => s.setAiConfig);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -96,7 +100,65 @@ export function SettingsPanel({ open, onClose }: Props) {
             checked={settings.colorblind}
             onChange={(v) => update({ colorblind: v })}
           />
+          <Toggle
+            label="Dyslexia-friendly text"
+            description="Wider spacing and a more legible font."
+            checked={settings.dyslexia}
+            onChange={(v) => update({ dyslexia: v })}
+          />
         </div>
+
+        <fieldset className="mt-8 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <legend className="text-sm font-semibold">AI mentor</legend>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            The mentor works without a key using the built-in lessons. Add a free-tier key to enable a
+            hosted model. Keys are stored only in this browser.
+          </p>
+
+          <label className="mt-3 block text-sm">
+            Provider
+            <select
+              value={aiConfig.provider}
+              onChange={(e) => setAiConfig({ provider: e.target.value as ProviderId })}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
+            >
+              <option value="offline">Built-in (no key)</option>
+              <option value="gemini">Gemini Flash</option>
+              <option value="groq">Groq (Llama/Qwen)</option>
+            </select>
+          </label>
+
+          <label className="mt-3 block text-sm">
+            Gemini API key
+            <input
+              type="password"
+              value={aiConfig.geminiKey ?? ''}
+              onChange={(e) => setAiConfig({ geminiKey: e.target.value })}
+              placeholder="AI… (from Google AI Studio)"
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-xs dark:border-slate-700 dark:bg-slate-900"
+            />
+          </label>
+
+          <label className="mt-3 block text-sm">
+            Groq API key
+            <input
+              type="password"
+              value={aiConfig.groqKey ?? ''}
+              onChange={(e) => setAiConfig({ groqKey: e.target.value })}
+              placeholder="gsk_… (from console.groq.com)"
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-xs dark:border-slate-700 dark:bg-slate-900"
+            />
+          </label>
+
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={aiConfig.autoRoute}
+              onChange={(e) => setAiConfig({ autoRoute: e.target.checked })}
+            />
+            Auto-route to the best provider per task
+          </label>
+        </fieldset>
       </div>
     </div>
   );

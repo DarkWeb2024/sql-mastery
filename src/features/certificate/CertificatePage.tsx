@@ -6,6 +6,8 @@ import { compareResults } from '../../lib/validate';
 import { useProgress, type Certificate } from '../progress/store';
 import { downloadCertificate } from './certificatePdf';
 import { makeCertificateId, pickExam } from './examPool';
+import { buildLearnerGraph, concepts } from '../../lib/knowledgeGraph';
+import { allTopics } from '../../content/topics';
 import type { PracticeQuestion } from '../../types';
 
 const EXAM_SIZE = 6;
@@ -16,6 +18,8 @@ type Phase = 'intro' | 'exam' | 'result';
 
 export function CertificatePage() {
   const addCertificate = useProgress((s) => s.addCertificate);
+  const attempts = useProgress((s) => s.attempts);
+  const solved = useProgress((s) => s.solved);
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [name, setName] = useState('');
@@ -38,12 +42,29 @@ export function CertificatePage() {
       finishedRef.current = true;
       const passed = finalCorrect / EXAM_SIZE >= PASS_RATIO;
       if (passed) {
+        // Capture a competency breakdown from the mastery model at issue time, so
+        // the certificate reflects demonstrated ability per area, not just a score.
+        const graph = buildLearnerGraph(attempts, solved);
+        const builtTopics = allTopics.filter((t) => !t.comingSoon);
+        const categories = [...new Set(builtTopics.map((t) => t.category))];
+        const competencies = categories.map((cat) => {
+          const ids = builtTopics.filter((t) => t.category === cat).map((t) => t.id);
+          const vals = ids.map((id) => graph.mastery[id]?.effective ?? 0);
+          const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+          return { label: cat, score: Math.round(avg * 100) };
+        });
+        const skills = concepts
+          .filter((c) => graph.mastery[c.id]?.state === 'mastered')
+          .map((c) => c.title);
+
         const cert: Certificate = {
           id: makeCertificateId(),
           name: name.trim() || 'SQL Learner',
           score: finalCorrect,
           total: EXAM_SIZE,
           issuedAt: new Date().toISOString(),
+          competencies,
+          skills,
         };
         addCertificate(cert);
         setCertificate(cert);
@@ -52,7 +73,7 @@ export function CertificatePage() {
       }
       setPhase('result');
     },
-    [addCertificate, name]
+    [addCertificate, name, attempts, solved]
   );
 
   // Countdown timer. When it hits zero the exam ends automatically.

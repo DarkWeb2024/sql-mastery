@@ -3,6 +3,9 @@ import { useProgress, levelFromXp, accuracy } from './store';
 import { allTopics } from '../../content/topics';
 import { SkillRadar } from '../../components/SkillRadar';
 import { CompletionMap } from '../../components/CompletionMap';
+import { buildLearnerGraph } from '../../lib/knowledgeGraph';
+import { overallMasteryScore } from '../../lib/mastery';
+import { interviewReadiness, learningVelocity, retentionRate } from '../../lib/analytics';
 
 interface Achievement {
   id: string;
@@ -19,6 +22,18 @@ export function DashboardPage() {
   const builtTopics = allTopics.filter((t) => !t.comingSoon);
   const totalQuestions = builtTopics.reduce((n, t) => n + t.practice.length, 0);
   const acc = accuracy(attempts);
+
+  // Mastery-model-derived analytics.
+  const graph = buildLearnerGraph(attempts, solved);
+  const masteries = Object.values(graph.mastery);
+  const masteryScore = overallMasteryScore(masteries);
+  const retention = retentionRate(masteries);
+  const velocity = learningVelocity(recentActivity);
+  const hardQuestions = builtTopics.flatMap((t) =>
+    t.practice.filter((q) => q.difficulty === 'hard' || q.difficulty === 'expert')
+  );
+  const hardSolved = hardQuestions.filter((q) => solved[q.id]).length;
+  const readiness = interviewReadiness(masteries, hardSolved, hardQuestions.length);
 
   // One radar axis per topic category: how much of that category is solved.
   const categories = Array.from(new Set(builtTopics.map((t) => t.category)));
@@ -64,6 +79,16 @@ export function DashboardPage() {
         <Stat label="Total XP" value={`${xp}`} sub={`${solvedCount}/${totalQuestions} questions solved`} />
         <Stat label="Accuracy" value={`${acc}%`} sub="across all attempts" />
         <Stat label="Daily streak" value={`${streakCount}`} sub={streakCount === 1 ? 'day' : 'days'} />
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-lg font-semibold">Learning analytics</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat label="Mastery score" value={`${masteryScore}`} sub="effective mastery, 0-100" />
+          <Stat label="Interview readiness" value={`${readiness}`} sub="mastery + hard questions" />
+          <Stat label="Retention" value={`${retention}%`} sub="how much is still fresh" />
+          <Stat label="Velocity" value={`${velocity}`} sub="solves in the last 7 days" />
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[300px_1fr]">

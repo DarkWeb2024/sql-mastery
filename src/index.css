@@ -96,3 +96,17 @@ body {
 .cb .text-emerald-700 {
   color: #0072b2 !important;
 }
+
+/* Dyslexia-friendly: more legible system fonts with looser spacing. Code stays
+   monospaced so SQL remains aligned. */
+.dyslexia body {
+  font-family: Verdana, Tahoma, 'Segoe UI', sans-serif;
+  letter-spacing: 0.03em;
+  word-spacing: 0.08em;
+  line-height: 1.7;
+}
+.dyslexia code,
+.dyslexia pre {
+  letter-spacing: normal;
+  word-spacing: normal;
+}

@@ -22,6 +22,34 @@ export function VerifyPage() {
             <Row label="Score" value={`${cert.score} / ${cert.total}`} />
             <Row label="Issued" value={new Date(cert.issuedAt).toLocaleString()} />
           </dl>
+
+          {cert.competencies && cert.competencies.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+                Competency breakdown
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {cert.competencies.map((c) => (
+                  <li key={c.label} className="flex items-center gap-2 text-sm">
+                    <span className="w-28 shrink-0">{c.label}</span>
+                    <span className="h-2 flex-1 rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
+                      <span className="block h-full rounded-full bg-emerald-500" style={{ width: `${c.score}%` }} />
+                    </span>
+                    <span className="w-10 text-right">{c.score}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {cert.skills && cert.skills.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+                Skills demonstrated
+              </p>
+              <p className="mt-1 text-sm">{cert.skills.join(', ')}</p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-700 dark:bg-amber-950/30">

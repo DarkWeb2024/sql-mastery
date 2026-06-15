@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { isDue, newCard, schedule } from './srs';
+import { todayKey } from './storage';
 
 describe('spaced-repetition scheduler', () => {
   it('a new card is due immediately', () => {
-    expect(isDue(newCard(), '2026-06-14')).toBe(true);
+    // newCard() is due today, so compare against the same notion of "today"
+    // rather than a hardcoded date that drifts out of range over time.
+    expect(isDue(newCard(), todayKey())).toBe(true);
   });
 
   it('a miss resets the streak and brings the card back the next day', () => {

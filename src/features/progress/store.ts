@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import type { Difficulty } from '../../types';
 import { dayDiff, todayKey } from '../../lib/storage';
 import { newCard, schedule, type CardSchedule, type Grade } from '../../lib/srs';
+import { DEFAULT_AI_CONFIG, type AiConfig } from '../../lib/ai/types';
+import type { LearningMode } from '../../lib/adaptive';
 
 export const XP_BY_DIFFICULTY: Record<Difficulty, number> = {
   beginner: 10,
@@ -26,12 +28,20 @@ export function levelFromXp(xp: number): { level: number; into: number; span: nu
   return { level, into: remaining, span };
 }
 
+export interface Competency {
+  label: string;
+  score: number; // 0..100
+}
+
 export interface Certificate {
   id: string;
   name: string;
   score: number;
   total: number;
   issuedAt: string;
+  /** Per-category mastery captured at issue time (optional for older certs). */
+  competencies?: Competency[];
+  skills?: string[];
 }
 
 interface ProgressState {
@@ -48,15 +58,21 @@ interface ProgressState {
   bookmarkedQuestions: Record<string, true>;
   notes: Record<string, string>;
   drafts: Record<string, string>;
-  attempts: Record<string, { attempts: number; correct: number }>;
+  attempts: Record<string, { attempts: number; correct: number; lastAt?: string }>;
   recentActivity: ActivityItem[];
   cards: Record<string, CardSchedule>;
+  aiConfig: AiConfig;
+  goal: string;
+  mode: LearningMode | null;
 
   recordSolve: (questionId: string, difficulty: Difficulty) => void;
   completeTopic: (topicId: string) => void;
   registerActivity: () => void;
   addCertificate: (cert: Certificate) => void;
   recordAttempt: (questionId: string, correct: boolean) => void;
+  setAiConfig: (patch: Partial<AiConfig>) => void;
+  setGoal: (goal: string) => void;
+  setMode: (mode: LearningMode | null) => void;
   toggleBookmarkTopic: (topicId: string) => void;
   toggleBookmarkQuestion: (questionId: string) => void;
   setNote: (topicId: string, markdown: string) => void;
@@ -90,6 +106,9 @@ export const useProgress = create<ProgressState>()(
       attempts: {},
       recentActivity: [],
       cards: {},
+      aiConfig: DEFAULT_AI_CONFIG,
+      goal: '',
+      mode: null,
 
       recordSolve: (questionId, difficulty) => {
         if (get().solved[questionId]) return; // award XP only once per question
@@ -112,10 +131,15 @@ export const useProgress = create<ProgressState>()(
               [questionId]: {
                 attempts: prev.attempts + 1,
                 correct: prev.correct + (correct ? 1 : 0),
+                lastAt: todayKey(),
               },
             },
           };
         }),
+
+      setAiConfig: (patch) => set((s) => ({ aiConfig: { ...s.aiConfig, ...patch } })),
+      setGoal: (goal) => set({ goal }),
+      setMode: (mode) => set({ mode }),
 
       toggleBookmarkTopic: (topicId) =>
         set((s) => {
@@ -178,11 +202,14 @@ export const useProgress = create<ProgressState>()(
           attempts: {},
           recentActivity: [],
           cards: {},
+          aiConfig: DEFAULT_AI_CONFIG,
+          goal: '',
+          mode: null,
         }),
     }),
     {
       name: 'sql-mastery-progress',
-      version: 2,
+      version: 3,
       // Older saved state lacks the Phase 2 fields. Merge defaults in so it
       // loads cleanly instead of leaving fields undefined.
       migrate: (persisted) => persisted as ProgressState,
