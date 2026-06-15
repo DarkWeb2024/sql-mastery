@@ -1,25 +1,30 @@
 // @vitest-environment node
 import { beforeAll, describe, expect, it } from 'vitest';
 import initSqlJs from 'sql.js';
-import { companyDataset } from '../src/content/datasets/company';
+import { datasets } from '../src/content/datasets';
 import { allTopics } from '../src/content/topics';
 import { compareResults } from '../src/lib/validate';
 import type { ResultSet } from '../src/types';
 
-// This test is the safety net for content correctness. It runs every authored
-// solution against a freshly seeded database. If a solution has a typo, queries
-// a missing column, or an "order matters" question forgets ORDER BY, this fails
-// before the question ever reaches a learner.
+// This test is the safety net for content correctness. It seeds every dataset
+// and runs each authored solution against the dataset that question targets. If a
+// solution has a typo, queries a missing column, or an "order matters" question
+// forgets ORDER BY, this fails before the question ever reaches a learner.
 
-let db: InstanceType<Awaited<ReturnType<typeof initSqlJs>>['Database']>;
+type Db = InstanceType<Awaited<ReturnType<typeof initSqlJs>>['Database']>;
+const dbs = new Map<string, Db>();
 
 beforeAll(async () => {
   const SQL = await initSqlJs();
-  db = new SQL.Database();
-  db.run(companyDataset.seedSql);
+  for (const id of Object.keys(datasets)) {
+    const db = new SQL.Database();
+    db.run(datasets[id].seedSql);
+    dbs.set(id, db);
+  }
 });
 
-function exec(sql: string): ResultSet {
+function exec(datasetId: string, sql: string): ResultSet {
+  const db = dbs.get(datasetId)!;
   const out = db.exec(sql);
   if (out.length === 0) return { columns: [], rows: [] };
   const last = out[out.length - 1];
@@ -41,15 +46,21 @@ describe('practice content integrity', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('references datasets that exist', () => {
+    for (const q of questions) {
+      expect(Object.keys(datasets), `question ${q.id}`).toContain(q.datasetId);
+    }
+  });
+
   it.each(questions.map((q) => [q.id, q] as const))(
-    'solution for %s runs and returns rows',
+    'solution for %s runs and is deterministic',
     (_id, q) => {
-      const result = exec(q.solution);
-      expect(result.columns.length).toBeGreaterThan(0);
+      const result = exec(q.datasetId, q.solution);
+      expect(result.columns.length, `question ${q.id} returned no columns`).toBeGreaterThan(0);
       expect(Array.isArray(result.rows)).toBe(true);
       // A solution comparing to itself must always be correct, which proves the
-      // validator and the canonical answer agree.
-      expect(compareResults(result, exec(q.solution), q.orderMatters).correct).toBe(true);
+      // validator and the canonical answer agree and that the query is stable.
+      expect(compareResults(result, exec(q.datasetId, q.solution), q.orderMatters).correct).toBe(true);
     }
   );
 
@@ -58,12 +69,6 @@ describe('practice content integrity', () => {
       if (q.orderMatters) {
         expect(q.solution.toUpperCase(), `question ${q.id}`).toContain('ORDER BY');
       }
-    }
-  });
-
-  it('references datasets that exist', () => {
-    for (const q of questions) {
-      expect(q.datasetId).toBe(companyDataset.id);
     }
   });
 });

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SqlEditor } from '../../components/SqlEditor';
-import { getDataset } from '../../content/datasets/company';
+import { getDataset } from '../../content/datasets';
 import { runQuery } from '../../lib/sqlEngine';
 import { compareResults } from '../../lib/validate';
 import { useProgress, type Certificate } from '../progress/store';

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { SqlEditor } from '../../components/SqlEditor';
 import { ResultGrid } from '../../components/ResultGrid';
 import { SchemaPanel } from '../../components/SchemaPanel';
-import { getDataset } from '../../content/datasets/company';
+import { getDataset } from '../../content/datasets';
 import { runQuery, type QueryOutcome } from '../../lib/sqlEngine';
 
 const STARTER_QUERY = 'SELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 5;';

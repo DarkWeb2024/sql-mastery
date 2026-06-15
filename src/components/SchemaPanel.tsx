@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getDataset } from '../content/datasets/company';
+import { getDataset } from '../content/datasets';
 import { runQuery } from '../lib/sqlEngine';
 
 interface TableSchema {

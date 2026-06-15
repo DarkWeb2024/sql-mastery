@@ -1,5 +1,28 @@
 # Changelog
 
+## Phase 4 — content depth (the engine finally has road)
+
+The platform had a strong learning engine but very little to learn from. This
+release roughly triples the practice content and adds the highest-value
+interview topics, so the adaptive engine, knowledge tree, and review system now
+operate on real depth.
+
+- New fully authored topics, each with theory, examples, common mistakes,
+  interview questions, and a validated practice bank:
+  - **Subqueries** (scalar, IN/EXISTS, correlated, subqueries in FROM) — 12 questions.
+  - **Common Table Expressions** (WITH, multiple CTEs, recursive) — 10 questions.
+  - **Window Functions** (OVER, PARTITION BY, RANK/ROW_NUMBER, LAG/LEAD, running
+    totals, moving averages, ratios) — 12 questions.
+- New **Regional sales** dataset (region, rep, month, amount) purpose-built for
+  window-function practice, alongside the existing company dataset. Datasets are
+  now a registry so more can be added easily.
+- These topics were previously "coming soon" stubs in the knowledge tree; they
+  now show live status, completion, and mastery like every other built topic, and
+  flow into Smart Practice, spaced-repetition review, and the certification exam
+  automatically.
+- The content-integrity test now seeds every dataset and validates all 34 new
+  solutions against the correct one. Total tests: 112.
+
 ## Phase 3 — adaptive mastery engine, knowledge tree, and AI mentor
 
 Built on top of Phase 2 with no existing feature removed and saved progress

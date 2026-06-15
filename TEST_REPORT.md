@@ -2,11 +2,13 @@
 
 ## Automated tests
 
-Run with `npm run test` (Vitest). Latest run: 78 tests across 12 files, all
+Run with `npm run test` (Vitest). Latest run: 112 tests across 12 files, all
 passing. Phase 3 added coverage for the mastery model (`src/lib/mastery.test.ts`),
 the adaptive engine (`src/lib/adaptive.test.ts`), tree state derivation
 (`src/lib/treeState.test.ts`), learning analytics (`src/lib/analytics.test.ts`),
-and the AI mentor router and offline provider (`src/lib/ai/ai.test.ts`).
+and the AI mentor router and offline provider (`src/lib/ai/ai.test.ts`). Phase 4
+expanded the content-integrity suite to seed every dataset and validate all
+subquery, CTE, and window-function solutions against the correct one.
 
 | Area                | File                                          | What it covers                                                                 |
 |---------------------|-----------------------------------------------|--------------------------------------------------------------------------------|

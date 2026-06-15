@@ -1,4 +1,4 @@
-import { getDataset } from '../../content/datasets/company';
+import { getDataset } from '../../content/datasets';
 import { runQuery } from '../sqlEngine';
 import { compareResults } from '../validate';
 import { askMentor } from './index';

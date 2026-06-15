@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { getTopic } from '../../content/topics';
-import { getDataset } from '../../content/datasets/company';
+import { getDataset } from '../../content/datasets';
 import { SqlEditor } from '../../components/SqlEditor';
 import { ResultGrid } from '../../components/ResultGrid';
 import { SchemaPanel } from '../../components/SchemaPanel';

@@ -64,9 +64,26 @@ SQLite (via sql.js) each session.
   orders, which makes LEFT JOIN exercises meaningful.
 - An order contains many order items, each referencing a product.
 
-## Why one dataset
+## Why one core dataset
 
-Keeping every Phase 1 question on the same schema lets learners build a mental
-model of the data rather than relearning a new schema for each question. New
-datasets can be added to `src/content/datasets` and referenced by a question's
-`datasetId` when later topics need them.
+Keeping most questions on the same schema lets learners build a mental model of
+the data rather than relearning a new schema for each question. Datasets live in
+`src/content/datasets` (registered in `index.ts`) and a question selects one via
+its `datasetId`.
+
+## The sales dataset
+
+Window-function and analytics practice uses a second dataset, `sales`, a regional
+sales time-series. Its shape suits ranking and time-based windowing.
+
+### sales
+| column | type    | notes                                  |
+|--------|---------|----------------------------------------|
+| id     | INTEGER | primary key                            |
+| region | TEXT    | North, South, East, or West            |
+| rep    | TEXT    | sales representative                   |
+| month  | TEXT    | YYYY-MM, four months in 2023           |
+| amount | INTEGER | sales amount for that rep and month    |
+
+Amounts are kept distinct within each region so ranking questions have a single
+unambiguous answer.

@@ -118,13 +118,3 @@ INSERT INTO order_items (id, order_id, product_id, quantity) VALUES
   (13, 10, 1, 10);
 `,
 };
-
-export const datasets: Record<string, Dataset> = {
-  [companyDataset.id]: companyDataset,
-};
-
-export function getDataset(id: string): Dataset {
-  const ds = datasets[id];
-  if (!ds) throw new Error(`Unknown dataset: ${id}`);
-  return ds;
-}

@@ -3,9 +3,12 @@ import { basics } from './basics';
 import { filtering } from './filtering';
 import { aggregation } from './aggregation';
 import { joins } from './joins';
+import { subqueries } from './subqueries';
+import { cte } from './cte';
+import { windowFunctions } from './window';
 
-// Fully authored topics for Phase 1.
-const builtTopics: Topic[] = [basics, filtering, aggregation, joins];
+// Fully authored topics.
+const builtTopics: Topic[] = [basics, filtering, aggregation, joins, subqueries, cte, windowFunctions];
 
 // Placeholder nodes so the full roadmap is visible from day one. Adding real
 // content later is just a matter of replacing the stub with a full module.
@@ -32,9 +35,6 @@ function stub(
 }
 
 const upcomingTopics: Topic[] = [
-  stub('subqueries', 'Subqueries', 'Subqueries', 'Queries nested inside other queries.', ['joins']),
-  stub('cte', 'Common Table Expressions', 'CTE', 'Name intermediate results with WITH.', ['subqueries']),
-  stub('window', 'Window Functions', 'Window Functions', 'Ranking and running totals without collapsing rows.', ['cte']),
   stub('indexes', 'Indexes', 'Indexes', 'How indexes speed up lookups and what they cost.', ['window']),
   stub('views', 'Views', 'Views', 'Saved queries you can treat like tables.', ['cte']),
   stub('procedures', 'Stored Procedures', 'Procedures', 'Reusable server-side routines.', ['views']),

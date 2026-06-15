@@ -18,8 +18,11 @@ describe('computeTreeState', () => {
     const states = computeTreeState(sqlTree.root, {}, {});
     expect(states.get('select')?.status).toBe('available');
     expect(states.get('select')?.hasContent).toBe(true);
-    // Window functions have no practice content yet.
-    expect(states.get('window')?.status).toBe('planned');
+    // Window functions now have content but are gated behind prerequisites.
+    expect(states.get('window')?.hasContent).toBe(true);
+    expect(states.get('window')?.status).toBe('locked');
+    // Indexes has no practice content yet, so it stays planned.
+    expect(states.get('indexes')?.status).toBe('planned');
   });
 
   it('rolls completion up to the SELECT node when its topic is solved', () => {
