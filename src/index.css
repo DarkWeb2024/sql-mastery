@@ -4,6 +4,10 @@
 
 :root {
   color-scheme: light dark;
+  --node-bg: #ffffff;
+}
+.dark {
+  --node-bg: #0f172a;
 }
 
 html,
@@ -18,16 +22,19 @@ body {
      has depth instead of a flat fill. */
   background-color: #f3f5fb;
   background-image:
-    radial-gradient(1100px 600px at 12% -8%, rgba(52, 120, 246, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(212, 169, 90, 0.10), transparent 55%);
+    radial-gradient(1000px 560px at 8% -10%, rgba(79, 140, 255, 0.12), transparent 60%),
+    radial-gradient(900px 520px at 95% -5%, rgba(139, 92, 246, 0.12), transparent 58%),
+    radial-gradient(800px 520px at 60% 110%, rgba(6, 182, 212, 0.10), transparent 60%);
   background-attachment: fixed;
 }
 
 .dark body {
   background-color: #070b16;
   background-image:
-    radial-gradient(1100px 600px at 10% -10%, rgba(52, 120, 246, 0.16), transparent 60%),
-    radial-gradient(900px 520px at 100% 0%, rgba(212, 169, 90, 0.12), transparent 55%);
+    radial-gradient(1000px 560px at 6% -10%, rgba(79, 140, 255, 0.20), transparent 60%),
+    radial-gradient(900px 540px at 98% -6%, rgba(139, 92, 246, 0.18), transparent 58%),
+    radial-gradient(820px 540px at 55% 112%, rgba(244, 63, 94, 0.12), transparent 60%),
+    radial-gradient(700px 480px at 80% 50%, rgba(6, 182, 212, 0.10), transparent 60%);
 }
 
 /* Glassy surface used by the header and floating panels for a modern, layered
@@ -38,6 +45,31 @@ body {
 }
 .dark .glass {
   background-color: rgba(10, 16, 32, 0.62);
+}
+
+/* A vibrant gradient text treatment for hero and section headlines. */
+.text-gradient {
+  background-image: linear-gradient(100deg, #4f8cff 0%, #8b5cf6 45%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Interactive surface: lifts and glows in an accent colour on hover. The glow
+   hue is supplied per element via the --glow custom property so different cards
+   light up in different colours. */
+.lift {
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1),
+    border-color 0.18s ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--glow, rgba(79, 140, 255, 0.35));
+}
+.reduce-motion .lift:hover {
+  transform: none;
 }
 
 /* Headings use the display face for a more editorial, premium feel; body stays

@@ -1,5 +1,22 @@
 # Changelog
 
+## Vibrant multi-colour theme
+
+The interface was too uniformly blue. It is now colour-coded by subject, the way
+the best learning products are, with richer interaction.
+
+- **Vibrant palette:** a multi-hue accent system (blue, violet, green, amber,
+  cyan, rose, and more) assigned per topic category, so each branch of the tree
+  and each card has its own identity instead of one blue.
+- **Colour-coded knowledge tree:** every section and its branch share a vibrant
+  hue; nodes carry a tinted surface and an inset accent, status stays readable
+  via a glowing dot and the mastery bar.
+- **Multi-colour live background:** the constellation points now span the full
+  palette, and the background gradients blend blue, violet, cyan, and rose.
+- **Real hover everywhere:** cards and tree nodes lift and glow in their own
+  accent colour on hover (disabled under reduced motion).
+- **Gradient hero:** the headline uses a blue-violet-cyan gradient.
+
 ## Visual modernization — live background and a premium feel
 
 A look-and-feel overhaul so the product feels modern and alive rather than like a

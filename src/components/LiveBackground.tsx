@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useTheme } from '../app/ThemeProvider';
 import { useSettings } from '../app/SettingsProvider';
+import { VIBRANT, withAlpha } from '../lib/palette';
 
 // A live constellation backdrop: drifting points connected by faint lines, a
 // quiet nod to a knowledge graph and to the geometric star motif. It sits behind
@@ -21,8 +22,8 @@ export function LiveBackground() {
     const c = ctx;
 
     const dark = theme === 'dark';
-    const dot = dark ? 'rgba(125,160,255,0.55)' : 'rgba(31,91,224,0.40)';
-    const line = dark ? 'rgba(212,169,90,0.18)' : 'rgba(31,91,224,0.10)';
+    const line = dark ? 'rgba(148,163,184,0.16)' : 'rgba(100,116,139,0.12)';
+    const dotAlpha = dark ? 0.7 : 0.5;
 
     let width = 0;
     let height = 0;
@@ -33,6 +34,7 @@ export function LiveBackground() {
       y: number;
       vx: number;
       vy: number;
+      color: string;
     }
     let points: P[] = [];
 
@@ -44,6 +46,8 @@ export function LiveBackground() {
         y: Math.random() * height,
         vx: (Math.random() - 0.5) * 0.25,
         vy: (Math.random() - 0.5) * 0.25,
+        // Each point carries its own vibrant hue so the field is multi-colour.
+        color: withAlpha(VIBRANT[Math.floor(Math.random() * VIBRANT.length)], dotAlpha),
       }));
     }
 
@@ -68,9 +72,9 @@ export function LiveBackground() {
       }
       for (let i = 0; i < points.length; i += 1) {
         const a = points[i];
-        c.fillStyle = dot;
+        c.fillStyle = a.color;
         c.beginPath();
-        c.arc(a.x, a.y, 1.6, 0, Math.PI * 2);
+        c.arc(a.x, a.y, 2, 0, Math.PI * 2);
         c.fill();
         for (let j = i + 1; j < points.length; j += 1) {
           const b = points[j];

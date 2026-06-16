@@ -17,6 +17,7 @@ import { computeTreeState, STATUS_LABEL, type NodeComputed, type NodeStatus } fr
 import { useProgress } from '../progress/store';
 import { useSettings } from '../../app/SettingsProvider';
 import { Badge } from '../../components/ui';
+import { colorForKey, withAlpha } from '../../lib/palette';
 
 // The tree is the defining experience, so it is a spatial canvas you pan, zoom,
 // and focus into, not an outline you scroll. Each node carries its live status
@@ -43,31 +44,39 @@ interface NodeData {
   node: TreeNode;
   computed?: NodeComputed;
   dimmed: boolean;
+  hue: string;
 }
 
 function TreeFlowNode({ data }: NodeProps<NodeData>) {
-  const { node, computed, dimmed } = data;
+  const { node, computed, dimmed, hue } = data;
   const status = computed?.status ?? 'planned';
-  const accent = STATUS_ACCENT[status];
+  const statusColor = STATUS_ACCENT[status];
   const mastery = computed?.mastery ?? 0;
   return (
     <div
-      className="rounded-xl bg-white px-3 py-2 shadow-card transition-all duration-150 dark:bg-slate-900"
+      className="lift rounded-xl px-3 py-2 shadow-card"
       style={{
         width: NODE_W,
         height: NODE_H,
-        borderLeft: `4px solid ${accent}`,
-        opacity: dimmed ? 0.35 : 1,
+        borderLeft: `4px solid ${hue}`,
+        background: `linear-gradient(180deg, ${withAlpha(hue, 0.1)}, rgba(255,255,255,0) 70%), var(--node-bg)`,
+        boxShadow: `0 1px 2px rgba(15,23,42,0.06), inset 0 0 0 1px ${withAlpha(hue, 0.25)}`,
+        opacity: dimmed ? 0.3 : 1,
+        ['--glow' as string]: withAlpha(hue, 0.5),
       }}
     >
       <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-slate-300" />
       <div className="flex items-center gap-1.5">
-        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: accent }} aria-hidden="true" />
-        <span className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{node.title}</span>
+        <span
+          className="h-2.5 w-2.5 shrink-0 rounded-full"
+          style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
+          aria-hidden="true"
+        />
+        <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{node.title}</span>
       </div>
       {computed?.hasContent ? (
-        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
-          <div className="h-full rounded-full" style={{ width: `${mastery}%`, background: accent }} />
+        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-700/70" aria-hidden="true">
+          <div className="h-full rounded-full" style={{ width: `${mastery}%`, background: hue }} />
         </div>
       ) : (
         <div className="mt-1 text-[10px] uppercase tracking-wide text-slate-400">{STATUS_LABEL[status]}</div>
@@ -86,10 +95,10 @@ function layout(states: Map<string, NodeComputed>) {
   const edges: Edge[] = [];
   let cursor = 0;
 
-  function place(node: TreeNode, depth: number): number {
+  function place(node: TreeNode, depth: number, hue: string): number {
     let y: number;
     if (node.children && node.children.length) {
-      const ys = node.children.map((c) => place(c, depth + 1));
+      const ys = node.children.map((c) => place(c, depth + 1, hue));
       y = ys.reduce((a, b) => a + b, 0) / ys.length;
       node.children.forEach((c) => {
         edges.push({
@@ -97,7 +106,7 @@ function layout(states: Map<string, NodeComputed>) {
           source: node.id,
           target: c.id,
           type: 'smoothstep',
-          style: { stroke: '#cbd5e1', strokeWidth: 1.5 },
+          style: { stroke: withAlpha(hue, 0.5), strokeWidth: 1.5 },
         });
       });
     } else {
@@ -108,13 +117,14 @@ function layout(states: Map<string, NodeComputed>) {
       id: node.id,
       type: 'tree',
       position: { x: depth * COL_W, y },
-      data: { node, computed: states.get(node.id), dimmed: false },
+      data: { node, computed: states.get(node.id), dimmed: false, hue },
       draggable: false,
     });
     return y;
   }
 
-  (sqlTree.root.children ?? []).forEach((section) => place(section, 0));
+  // Each top-level section gets its own vibrant hue, shared by its whole branch.
+  (sqlTree.root.children ?? []).forEach((section) => place(section, 0, colorForKey(section.id)));
   return { nodes, edges };
 }
 

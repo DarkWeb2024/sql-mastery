@@ -3,23 +3,28 @@ import { BrandMark } from '../../components/BrandMark';
 import { courses } from '../../content/courses';
 import { useProgress, levelFromXp } from '../progress/store';
 import { allTopics } from '../../content/topics';
+import { withAlpha } from '../../lib/palette';
 
 const features = [
   {
     title: 'Practice-first',
     body: 'Short theory, then a lot of doing. Most of your time is spent writing and running real queries.',
+    color: '#4F8CFF',
   },
   {
     title: 'Runs in your browser',
     body: 'A real SQLite engine runs locally. No sign-up, no servers, nothing to install.',
+    color: '#22C55E',
   },
   {
     title: 'Graded the honest way',
     body: 'Your query is checked against the correct answer by actually running both and comparing.',
+    color: '#F59E0B',
   },
   {
     title: 'Track your growth',
     body: 'Experience, levels, streaks, accuracy, and spaced-repetition review keep you moving.',
+    color: '#EC4899',
   },
 ];
 
@@ -46,7 +51,7 @@ export function LandingPage() {
       <section className="grid items-center gap-8 py-8 md:grid-cols-2">
         <div className="space-y-5">
           <BrandMark size={44} />
-          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="text-gradient text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
             Where data becomes decisions.
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300">
@@ -89,8 +94,19 @@ ORDER BY avg_salary DESC;`}</code>
         <h2 className="text-2xl font-bold">Why Mizan</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
-            <div key={f.title} className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-              <h3 className="font-semibold">{f.title}</h3>
+            <div
+              key={f.title}
+              className="lift rounded-xl border border-slate-200 bg-white/60 p-4 dark:border-slate-800 dark:bg-slate-900/50"
+              style={{ borderTop: `3px solid ${f.color}`, ['--glow' as string]: withAlpha(f.color, 0.35) }}
+            >
+              <span
+                className="grid h-9 w-9 place-items-center rounded-lg text-sm font-bold"
+                style={{ backgroundColor: withAlpha(f.color, 0.18), color: f.color }}
+                aria-hidden="true"
+              >
+                {f.title[0]}
+              </span>
+              <h3 className="mt-3 font-semibold">{f.title}</h3>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{f.body}</p>
             </div>
           ))}
@@ -108,7 +124,8 @@ ORDER BY avg_salary DESC;`}</code>
           {courses.map((c) => (
             <div
               key={c.id}
-              className="flex flex-col rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+              className="lift flex flex-col rounded-xl border border-slate-200 bg-white/60 p-4 dark:border-slate-800 dark:bg-slate-900/50"
+              style={{ ['--glow' as string]: withAlpha(c.accent, 0.4) }}
             >
               <span
                 className="inline-block h-2 w-10 rounded-full"
