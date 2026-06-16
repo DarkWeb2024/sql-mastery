@@ -25,12 +25,13 @@ import { Loading } from '../components/Loading';
 import { Badge, IconButton } from '../components/ui';
 import { CommandPalette } from '../components/CommandPalette';
 import { MentorPanel } from '../features/mentor/MentorPanel';
+import { LiveBackground } from '../components/LiveBackground';
 
 // Primary navigation is deliberately short: the four destinations that map to how
 // a learner actually moves (explore, do real work, practise, track growth).
 // Everything else lives under More so the header stays calm.
 const primaryNav = [
-  { to: '/tree', label: 'Tree', icon: Network },
+  { to: '/tree', label: 'Universe', icon: Network },
   { to: '/missions', label: 'Missions', icon: Briefcase },
   { to: '/learn', label: 'Practice', icon: Dumbbell },
   { to: '/dashboard', label: 'Progress', icon: BarChart3 },
@@ -97,6 +98,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-full flex-col">
+      <LiveBackground />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[70] focus:rounded-md focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-white"
@@ -104,7 +106,7 @@ export function Layout() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/70">
+      <header className="glass sticky top-0 z-20 border-b border-slate-200/60 dark:border-slate-800/60">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <NavLink to="/" aria-label="Mizan home" className="shrink-0">
             <BrandMark />

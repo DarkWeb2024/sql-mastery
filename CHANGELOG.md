@@ -1,5 +1,24 @@
 # Changelog
 
+## Visual modernization — live background and a premium feel
+
+A look-and-feel overhaul so the product feels modern and alive rather than like a
+functional dashboard.
+
+- **Live animated background:** a drifting constellation of connected points
+  behind the content, evoking a knowledge graph and the brand's geometric star.
+  It is low-opacity for readability and goes completely still under reduced motion.
+- **Modern color field:** layered radial gradients in brand blue and gold over a
+  deep base in dark mode and a soft light base, replacing the flat fill.
+- **Glassy surfaces:** the header and floating panels use a translucent, blurred
+  treatment for depth.
+- **Sharper interactions:** interactive cards lift and gain an accent ring on
+  hover; transitions are consistent.
+- **Renamed tabs:** primary navigation reads Universe, Missions, Practice,
+  Progress, with the rest under More.
+
+Next: completing the full SQL syllabus so no topic remains "coming soon".
+
 ## Rebrand — Khwarizmi is now Mizan
 
 The product is renamed from Khwarizmi to Mizan ("balance" and "measure": the

@@ -82,7 +82,7 @@ export function Card({
     <div
       className={`rounded-xl bg-white shadow-card dark:bg-slate-900 ${
         interactive
-          ? 'cursor-pointer transition-transform duration-150 ease-standard hover:-translate-y-0.5 hover:shadow-raised motion-reduce:hover:translate-y-0'
+          ? 'cursor-pointer ring-1 ring-transparent transition duration-200 ease-standard hover:-translate-y-0.5 hover:shadow-raised hover:ring-brand-300 dark:hover:ring-brand-600 motion-reduce:hover:translate-y-0'
           : ''
       } ${className}`}
     >

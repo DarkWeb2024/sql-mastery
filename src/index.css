@@ -13,7 +13,31 @@ body,
 }
 
 body {
-  @apply bg-slate-50 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100;
+  @apply text-slate-800 antialiased dark:text-slate-100;
+  /* A soft, modern gradient field sits under the live constellation so the page
+     has depth instead of a flat fill. */
+  background-color: #f3f5fb;
+  background-image:
+    radial-gradient(1100px 600px at 12% -8%, rgba(52, 120, 246, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(212, 169, 90, 0.10), transparent 55%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-color: #070b16;
+  background-image:
+    radial-gradient(1100px 600px at 10% -10%, rgba(52, 120, 246, 0.16), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%, rgba(212, 169, 90, 0.12), transparent 55%);
+}
+
+/* Glassy surface used by the header and floating panels for a modern, layered
+   feel rather than flat opaque blocks. */
+.glass {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(1.4) blur(12px);
+}
+.dark .glass {
+  background-color: rgba(10, 16, 32, 0.62);
 }
 
 /* Headings use the display face for a more editorial, premium feel; body stays
