@@ -12,6 +12,9 @@ import {
   Moon,
   Flame,
   Zap,
+  Search,
+  Compass,
+  X,
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useProgress, levelFromXp } from '../features/progress/store';
@@ -20,6 +23,8 @@ import { SettingsPanel } from '../components/SettingsPanel';
 import { ReferenceWindow } from '../features/reference/ReferenceWindow';
 import { Loading } from '../components/Loading';
 import { Badge, IconButton } from '../components/ui';
+import { CommandPalette } from '../components/CommandPalette';
+import { MentorPanel } from '../features/mentor/MentorPanel';
 
 // Primary navigation is deliberately short: the four destinations that map to how
 // a learner actually moves (explore, do real work, practise, track growth).
@@ -52,6 +57,21 @@ export function Layout() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [navigatorOpen, setNavigatorOpen] = useState(false);
+
+  // The command palette shortcut is owned here so the search button and
+  // Cmd/Ctrl+K open the same thing.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   // Pulse the XP badge when experience increases, so earning points has a moment.
   const [xpPulse, setXpPulse] = useState(false);
@@ -145,12 +165,24 @@ export function Layout() {
           </nav>
 
           <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="hidden items-center gap-2 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm text-slate-500 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800 lg:flex"
+            >
+              <Search size={15} aria-hidden="true" />
+              <span>Search</span>
+              <kbd className="rounded border border-slate-300 px-1 text-[10px] dark:border-slate-600">⌘K</kbd>
+            </button>
             <Badge tone="accent" className="hidden md:inline-flex">
               <Flame size={13} aria-hidden="true" /> {streak}
             </Badge>
             <Badge tone="brand" className={`hidden md:inline-flex ${xpPulse ? 'animate-pop' : ''}`}>
               <Zap size={13} aria-hidden="true" /> Lv {level} · {xp}
             </Badge>
+            <IconButton label="AI Navigator" pressed={navigatorOpen} onClick={() => setNavigatorOpen((v) => !v)}>
+              <Compass size={18} />
+            </IconButton>
             <IconButton label="SQL reference" pressed={referenceOpen} onClick={() => setReferenceOpen((v) => !v)}>
               <BookMarked size={18} />
             </IconButton>
@@ -183,6 +215,31 @@ export function Layout() {
 
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <ReferenceWindow open={referenceOpen} onClose={() => setReferenceOpen(false)} />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+
+      {/* Always-available AI Navigator: a slide-in sidebar on any page. */}
+      {navigatorOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end" role="presentation">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setNavigatorOpen(false)} aria-hidden="true" />
+          <aside
+            role="dialog"
+            aria-label="AI Navigator"
+            className="relative flex h-full w-full max-w-md animate-fade-in flex-col bg-white shadow-float dark:bg-slate-900"
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+              <span className="flex items-center gap-2 font-semibold">
+                <Compass size={18} /> Navigator
+              </span>
+              <IconButton label="Close Navigator" onClick={() => setNavigatorOpen(false)}>
+                <X size={18} />
+              </IconButton>
+            </div>
+            <div className="min-h-0 flex-1">
+              <MentorPanel />
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }

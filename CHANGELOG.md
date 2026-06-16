@@ -1,5 +1,22 @@
 # Changelog
 
+## Phase 7 (partial) — command palette, AI Navigator, display type
+
+A first slice of the "feels like a learning OS" direction, chosen for high impact
+and low risk. The larger Phase 7 items that carry real cost or reverse prior
+decisions (rebrand, sidebar nav, color overhaul, homepage deletion, terminology
+rename) are intentionally deferred pending the founder's call and a real-user test.
+
+- **Command palette (Cmd/Ctrl+K):** global jump-to-anything across concepts,
+  missions, patterns, SQL commands, and destinations, with a header Search
+  affordance. The signature interaction of tools like Linear and Raycast.
+- **Always-present AI Navigator:** the mentor is now a slide-in sidebar available
+  from any page, not just its own route.
+- **Display typography:** Space Grotesk for headings (Inter for body, JetBrains
+  Mono for code) for a more editorial, premium feel.
+
+All additive; existing features and 122 tests unchanged.
+
 ## Phase 6 — Design System V1 and a tree that feels alive
 
 A product-experience pass, in response to the board's concern that the
