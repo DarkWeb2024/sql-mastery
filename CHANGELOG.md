@@ -1,5 +1,20 @@
 # Changelog
 
+## Studio-grade landing page
+
+The front door is rebuilt in the spirit of a high-end design studio, since it is
+what creates first interest. The app's functional pages stay clean and usable.
+
+- **Oversized editorial hero** with a gradient headline and large, confident type.
+- **Reveal-on-scroll** throughout, with a default-visible design so content can
+  never get stuck hidden, and it is inert under reduced motion.
+- **Marquee** of SQL keywords, a signature studio element.
+- **Big interactive capability rows** that underline and shift on hover, each in
+  its own colour, linking into the universe, missions, navigator, engine, and
+  certification.
+- **Premium course cards, a stats band, a philosophy pull-quote, and a gradient
+  call-to-action band.**
+
 ## Vibrant multi-colour theme
 
 The interface was too uniformly blue. It is now colour-coded by subject, the way

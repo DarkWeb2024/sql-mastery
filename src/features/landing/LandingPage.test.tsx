@@ -3,12 +3,15 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { axe } from 'vitest-axe';
 import { LandingPage } from './LandingPage';
+import { SettingsProvider } from '../../app/SettingsProvider';
 
 function renderLanding() {
   return render(
-    <MemoryRouter>
-      <LandingPage />
-    </MemoryRouter>
+    <SettingsProvider>
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>
+    </SettingsProvider>
   );
 }
 

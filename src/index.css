@@ -72,6 +72,79 @@ body {
   transform: none;
 }
 
+/* Reveal-on-scroll for the studio-style landing. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.7s cubic-bezier(0.2, 0, 0, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+.reduce-motion .reveal,
+.reduce-motion .reveal.in {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Marquee strip of keywords, a signature studio element. */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  white-space: nowrap;
+  animation: marquee 32s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-100%);
+  }
+}
+.reduce-motion .marquee-track {
+  animation: none;
+}
+
+/* Oversized display heading for the studio hero. */
+.display-xl {
+  font-family: 'Space Grotesk', Inter, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.75rem, 9vw, 7rem);
+}
+
+/* Large interactive rows that underline and shift on hover, agency-style. */
+.row-link {
+  transition:
+    color 0.2s ease,
+    padding-left 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+.row-link:hover {
+  padding-left: 0.75rem;
+}
+.reduce-motion .row-link:hover {
+  padding-left: 0;
+}
+
 /* Headings use the display face for a more editorial, premium feel; body stays
    Inter for readability. */
 h1,
