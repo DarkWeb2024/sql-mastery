@@ -48,7 +48,7 @@ export function buildMissionArtifact(mission: Mission, record: MissionRecord): s
   lines.push(`If the data changed: ${record.reflection.ifDataChanged || '(not provided)'}`);
   lines.push('');
   lines.push('---');
-  lines.push('Produced on Khwarizmi as a record of analytical reasoning.');
+  lines.push('Produced on Mizan as a record of analytical reasoning.');
 
   return lines.join('\n');
 }

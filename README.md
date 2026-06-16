@@ -1,11 +1,11 @@
-# Khwarizmi
+# Mizan
 
-A practice-first platform for learning data and programming, named after
-Al-Khwarizmi, whose work gave us the word algorithm. SQL is the first complete
-course, with more on the way. It pairs short theory with a large amount of
-hands-on practice: an interactive roadmap, an IDE-style practice workspace, an
-in-browser SQL playground, graded questions, a certification exam, spaced-
-repetition review, and progress tracking.
+A practice-first platform for learning data and programming. "Mizan" means
+balance and measure: the craft of weighing evidence and deciding well. SQL is
+the first complete course, with more on the way. It pairs short theory with a
+large amount of hands-on practice: an interactive knowledge tree, an IDE-style
+practice workspace, an in-browser SQL playground, role-based missions, graded
+questions, a certification exam, spaced-repetition review, and progress tracking.
 
 The whole thing runs in the browser. SQL executes against a real SQLite database
 compiled to WebAssembly, so there is no backend to run or pay for, and it can be

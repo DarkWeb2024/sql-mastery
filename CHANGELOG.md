@@ -1,5 +1,12 @@
 # Changelog
 
+## Rebrand — Khwarizmi is now Mizan
+
+The product is renamed from Khwarizmi to Mizan ("balance" and "measure": the
+craft of weighing evidence and deciding well), which fits the platform's focus on
+data, analysis, and judgment, and is easier globally. Visible identity only; the
+repository and URL remain unchanged. New tagline: "Where data becomes decisions."
+
 ## Phase 7 (partial) — command palette, AI Navigator, display type
 
 A first slice of the "feels like a learning OS" direction, chosen for high impact

@@ -15,8 +15,8 @@ function renderLanding() {
 describe('LandingPage', () => {
   it('shows the brand and a call to action', () => {
     renderLanding();
-    expect(screen.getByRole('heading', { name: /craft of algorithms/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/Khwarizmi/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /data becomes decisions/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Mizan/i).length).toBeGreaterThan(0);
   });
 
   it('lists the SQL course and marks others as coming soon', () => {

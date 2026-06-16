@@ -4,7 +4,7 @@ interface Props {
 }
 
 // An eight-point geometric star, a motif rooted in Islamic art, used as the
-// Khwarizmi mark. Drawn inline as SVG so there is no image asset to load.
+// Mizan mark. Drawn inline as SVG so there is no image asset to load.
 export function BrandMark({ withWordmark = true, size = 32 }: Props) {
   return (
     <span className="flex items-center gap-2">
@@ -13,7 +13,7 @@ export function BrandMark({ withWordmark = true, size = 32 }: Props) {
         height={size}
         viewBox="0 0 100 100"
         role="img"
-        aria-label="Khwarizmi"
+        aria-label="Mizan"
         className="shrink-0"
       >
         <defs>
@@ -29,7 +29,7 @@ export function BrandMark({ withWordmark = true, size = 32 }: Props) {
         </g>
       </svg>
       {withWordmark && (
-        <span className="text-lg font-bold tracking-tight">Khwarizmi</span>
+        <span className="text-lg font-bold tracking-tight">Mizan</span>
       )}
     </span>
   );

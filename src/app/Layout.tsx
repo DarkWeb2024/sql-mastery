@@ -106,7 +106,7 @@ export function Layout() {
 
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/70">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <NavLink to="/" aria-label="Khwarizmi home" className="shrink-0">
+          <NavLink to="/" aria-label="Mizan home" className="shrink-0">
             <BrandMark />
           </NavLink>
 
@@ -210,7 +210,7 @@ export function Layout() {
       </main>
 
       <footer className="border-t border-slate-200 px-4 py-6 text-center text-xs text-slate-500 dark:border-slate-800">
-        Khwarizmi runs entirely in your browser. Your progress is saved locally on this device.
+        Mizan runs entirely in your browser. Your progress is saved locally on this device.
       </footer>
 
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />

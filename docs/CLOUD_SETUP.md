@@ -1,6 +1,6 @@
-# Cloud setup (optional)
+﻿# Cloud setup (optional)
 
-Khwarizmi is local-first: it works fully with no accounts and no backend, and
+Mizan is local-first: it works fully with no accounts and no backend, and
 your progress is saved in your browser. The AI mentor also works offline using
 the built-in lessons. This document covers the optional cloud pieces and exactly
 what you need to create yourself, since accounts and keys cannot be created on
@@ -16,7 +16,7 @@ Keys are stored in your browser and sent directly to the provider.
 ### Gemini Flash (recommended primary)
 
 1. Open Google AI Studio (aistudio.google.com) and create a free API key.
-2. In Khwarizmi, open Settings, set Provider to Gemini Flash, and paste the key.
+2. In Mizan, open Settings, set Provider to Gemini Flash, and paste the key.
 
 ### Groq (recommended fallback, very fast)
 
@@ -29,7 +29,7 @@ lives in your browser and is used from your device only. Do not commit keys, and
 do not share a single key publicly. For a shared deployment, proxy the key
 through a Supabase Edge Function (below) so it is never exposed.
 
-## Supabase (accounts, sync, storage) — not enabled yet
+## Supabase (accounts, sync, storage) - not enabled yet
 
 To add real accounts, cross-device progress sync, and a public certificate
 verification database:
@@ -47,7 +47,7 @@ This layer is intentionally not wired into the live app yet, because it requires
 the steps above and would otherwise ship as non-functional code. The local-first
 design means it can be added later as a sync layer without disrupting anything.
 
-## PostHog (product analytics) — not enabled yet
+## PostHog (product analytics) - not enabled yet
 
 1. Create a free PostHog project.
 2. Add the project key to the app config behind an opt-in flag.
@@ -56,3 +56,4 @@ design means it can be added later as a sync layer without disrupting anything.
 
 Until configured, the app shows its own local analytics on the dashboard and
 sends nothing externally.
+

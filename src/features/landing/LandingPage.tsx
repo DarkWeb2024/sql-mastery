@@ -47,11 +47,12 @@ export function LandingPage() {
         <div className="space-y-5">
           <BrandMark size={44} />
           <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            Learn the craft of algorithms.
+            Where data becomes decisions.
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300">
-            Khwarizmi is a practice-first platform for learning data and programming, named after the
-            scholar whose work gave us the word algorithm. Start with SQL, with more on the way.
+            Mizan is a practice-first platform for learning data and programming. Mizan means balance
+            and measure: the craft of weighing evidence and deciding well. Start with SQL, with more
+            on the way.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -85,7 +86,7 @@ ORDER BY avg_salary DESC;`}</code>
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold">Why Khwarizmi</h2>
+        <h2 className="text-2xl font-bold">Why Mizan</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
             <div key={f.title} className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">

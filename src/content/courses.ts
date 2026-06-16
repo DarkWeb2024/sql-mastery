@@ -11,7 +11,7 @@ export interface Course {
   href?: string;
 }
 
-// Khwarizmi is a multi-subject platform. SQL is the first complete course; the
+// Mizan is a multi-subject platform. SQL is the first complete course; the
 // rest are placeholders that establish the direction without pretending to be
 // ready. New courses slot in here without touching the catalog UI.
 export const courses: Course[] = [

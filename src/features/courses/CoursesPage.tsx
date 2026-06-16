@@ -8,7 +8,7 @@ export function CoursesPage() {
       <header>
         <h1 className="text-2xl font-bold">Courses</h1>
         <p className="mt-1 text-slate-600 dark:text-slate-300">
-          Khwarizmi is built to hold many subjects. SQL is ready now; the rest are on the way.
+          Mizan is built to hold many subjects. SQL is ready now; the rest are on the way.
         </p>
       </header>
 
