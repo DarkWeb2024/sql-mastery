@@ -6,9 +6,23 @@ import { joins } from './joins';
 import { subqueries } from './subqueries';
 import { cte } from './cte';
 import { windowFunctions } from './window';
+import { setops } from './setops';
+import { analytics } from './analytics';
+import { interview } from './interview';
 
 // Fully authored topics.
-const builtTopics: Topic[] = [basics, filtering, aggregation, joins, subqueries, cte, windowFunctions];
+const builtTopics: Topic[] = [
+  basics,
+  filtering,
+  aggregation,
+  joins,
+  subqueries,
+  cte,
+  windowFunctions,
+  setops,
+  analytics,
+  interview,
+];
 
 // Placeholder nodes so the full roadmap is visible from day one. Adding real
 // content later is just a matter of replacing the stub with a full module.
@@ -40,9 +54,6 @@ const upcomingTopics: Topic[] = [
   stub('procedures', 'Stored Procedures', 'Procedures', 'Reusable server-side routines.', ['views']),
   stub('triggers', 'Triggers', 'Triggers', 'Run logic automatically on data changes.', ['procedures']),
   stub('optimization', 'Query Optimization', 'Optimization', 'Read query plans and tune slow queries.', ['indexes']),
-  stub('analytics', 'Analytics SQL', 'Analytics SQL', 'Patterns for cohort, funnel, and time-series analysis.', ['window']),
-  stub('interview', 'Interview SQL', 'Interview SQL', 'The question patterns that show up in interviews.', ['window']),
-  stub('projects', 'Industry Projects', 'Industry Projects', 'End-to-end analytics on realistic datasets.', ['analytics']),
 ];
 
 export const allTopics: Topic[] = [...builtTopics, ...upcomingTopics];
